@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="BPFTP.Android/BPFTP.Android.csproj" />
+  <Project Path="BPFTP.Desktop/BPFTP.Desktop.csproj" />
+  <Project Path="BPFTP.iOS/BPFTP.iOS.csproj" />
+  <Project Path="BPFTP/BPFTP.csproj" />
+</Solution>
