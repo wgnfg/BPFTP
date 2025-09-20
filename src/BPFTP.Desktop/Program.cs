@@ -1,6 +1,6 @@
-﻿using System;
-
-using Avalonia;
+﻿using Avalonia;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace BPFTP.Desktop;
 
@@ -10,8 +10,12 @@ class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
+    public static void Main(string[] args)
+    {
+        ConfigureServices(App.ServicesCollection);
+        BuildAvaloniaApp()
         .StartWithClassicDesktopLifetime(args);
+    }
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
@@ -19,5 +23,9 @@ class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();
+
+    public static void ConfigureServices(IServiceCollection services)
+    {
+    }
 
 }

@@ -3,6 +3,7 @@ using Android.Content.PM;
 
 using Avalonia;
 using Avalonia.Android;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BPFTP.Android;
 
@@ -16,7 +17,12 @@ public class MainActivity : AvaloniaMainActivity<App>
 {
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
+        ConfigureServices(App.ServicesCollection);
         return base.CustomizeAppBuilder(builder)
             .WithInterFont();
+    }
+
+    public static void ConfigureServices(IServiceCollection services)
+    {
     }
 }

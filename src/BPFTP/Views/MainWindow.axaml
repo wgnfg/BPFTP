@@ -8,5 +8,5 @@
         x:Class="BPFTP.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="BPFTP">
-        <views:MainView />
+        <views:Shell />
 </Window>
