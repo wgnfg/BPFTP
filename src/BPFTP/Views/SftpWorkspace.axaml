@@ -22,7 +22,7 @@
 							  DisplayMemberBinding="{Binding Name}"
 							  MinWidth="150"
 							  PlaceholderText="选"/>
-					<Button Content="连"/>
+					<Button Content="连" Command="{Binding ConnectCommand}"/>
 				</StackPanel>
 			</DockPanel>
 		</Border>

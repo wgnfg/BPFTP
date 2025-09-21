@@ -17,13 +17,14 @@ namespace BPFTP.ViewModels
         private ObservableCollection<ConnectionProfile> _connections = [];
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
         private ConnectionProfile? _selectedConnection;
 
 
         [RelayCommand]
         private async Task AddConnection()
         {
-            await SaveOrUpdateConnection(new ConnectionProfile() { Name = "Connect1" });
+            await SaveOrUpdateConnection(new ConnectionProfile() { Name = "Connect2", Username="foo",Password="1234", AuthMethod= AuthroizeMethod.Password,Host="127.0.0.1" });
         }
 
         [RelayCommand]

@@ -54,5 +54,6 @@ public partial class App : Application
         services.AddSingleton<SftpWorkspaceViewModel>();
 
         services.AddSingleton<DatabaseService>();
+        services.AddSingleton<SftpService>();
     }
 }
