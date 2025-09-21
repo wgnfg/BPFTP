@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using BPFTP.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,6 @@ namespace BPFTP.ViewModels
     public partial class ShellViewModel : ViewModelBase
     {
         [ObservableProperty]
-        ViewModelBase _content = new SftpWorkspaceViewModel();
+        ViewModelBase _content = App.ServiceProvider!.GetService<SftpWorkspaceViewModel>()!;
     }
 }

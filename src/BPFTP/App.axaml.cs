@@ -2,7 +2,7 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-
+using BPFTP.Services;
 using BPFTP.ViewModels;
 using BPFTP.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,5 +52,7 @@ public partial class App : Application
     {
         services.AddSingleton<ShellViewModel>();
         services.AddSingleton<SftpWorkspaceViewModel>();
+
+        services.AddSingleton<DatabaseService>();
     }
 }

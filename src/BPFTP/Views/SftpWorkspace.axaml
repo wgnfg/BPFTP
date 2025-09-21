@@ -2,7 +2,30 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"             
-            mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="BPFTP.Views.SftpWorkspace">
-  Welcome to BPFTP!
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 xmlns:drag="using:Avalonia.Xaml.Interactions.DragAndDrop"
+			 xmlns:utils="using:BPFTP.Utils"
+			 xmlns:vm="using:BPFTP.ViewModels"
+             x:Class="BPFTP.Views.SftpWorkspace"
+			 x:DataType="vm:SftpWorkspaceViewModel">
+	<Grid RowDefinitions="Auto, *">
+		<Border Grid.Row="0" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
+			<DockPanel>
+				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="5">
+					<Button Content="删" Command="{Binding DeleteConnectionCommand}"/>
+					<Button Content="改" Command="{Binding EditConnectionCommand}"/>
+				</StackPanel>
+				<StackPanel Orientation="Horizontal" Spacing="5">
+					<Button Content="增" Command="{Binding AddConnectionCommand}"/>
+					<ComboBox ItemsSource="{Binding Connections}"
+							  SelectedItem="{Binding SelectedConnection}"
+							  DisplayMemberBinding="{Binding Name}"
+							  MinWidth="150"
+							  PlaceholderText="选"/>
+					<Button Content="连"/>
+				</StackPanel>
+			</DockPanel>
+		</Border>
+
+	</Grid>
 </UserControl>

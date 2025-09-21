@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BPFTP.Services;
 
 namespace BPFTP.ViewModels
 {
-    public class SftpWorkspaceViewModel:ViewModelBase
+    public partial class SftpWorkspaceViewModel(DatabaseService databaseService) : ViewModelBase
     {
+        private readonly DatabaseService _databaseService = databaseService;
     }
 }
