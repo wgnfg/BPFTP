@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:BPFTP.ViewModels"
+			 mc:Ignorable="d" 
+             x:Class="BPFTP.Views.NormalPopup"
+			 x:DataType="vm:NormalPopupViewModel">
+	<Border Width="200" Height="100" BorderBrush="Black" BorderThickness="2" CornerRadius="10">
+		<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Message}"/>
+	</Border>
+</UserControl>

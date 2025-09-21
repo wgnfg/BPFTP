@@ -55,5 +55,6 @@ public partial class App : Application
 
         services.AddSingleton<DatabaseService>();
         services.AddSingleton<SftpService>();
+        services.AddSingleton<ViewService>();
     }
 }

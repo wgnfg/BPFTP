@@ -1,6 +1,8 @@
 ﻿using BPFTP.Models;
+using BPFTP.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Renci.SshNet.Messages;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,21 +20,39 @@ namespace BPFTP.ViewModels
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
+        [NotifyCanExecuteChangedFor(nameof(EditConnectionCommand))]
+        [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCommand))]
         private ConnectionProfile? _selectedConnection;
 
 
         [RelayCommand]
         private async Task AddConnection()
         {
-            await SaveOrUpdateConnection(new ConnectionProfile() { Name = "Connect2", Username="foo",Password="1234", AuthMethod= AuthroizeMethod.Password,Host="127.0.0.1" });
+            var theConnectionProfile = new ConnectionProfile();
+            await ViewService.Instance.ShowDialogAsync(new EditConnectionViewModel(theConnectionProfile, OnConfirm: async () =>
+            {
+                if (theConnectionProfile != null)
+                {
+                    await SaveOrUpdateConnection(theConnectionProfile);
+                }
+                ViewService.Instance.ShowPopup(new NormalPopupViewModel{ Message = "添加成功"});
+            }));
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(ConnectionSelected))]
         private async Task EditConnection()
         {
             if (SelectedConnection == null) return;
-
-            await SaveOrUpdateConnection(SelectedConnection);
+            var profileToEdit = SelectedConnection.Clone();
+            var vm = new EditConnectionViewModel(profileToEdit);
+            await ViewService.Instance.ShowDialogAsync(new EditConnectionViewModel(profileToEdit, OnConfirm: async () =>
+            {
+                if (profileToEdit != null)
+                {
+                    await SaveOrUpdateConnection(profileToEdit);
+                }
+                ViewService.Instance.ShowPopup(new NormalPopupViewModel { Message = "修改成功" });
+            }));
         }
 
         private async Task SaveOrUpdateConnection(ConnectionProfile profile)
@@ -47,7 +67,7 @@ namespace BPFTP.ViewModels
             Connections = new ObservableCollection<ConnectionProfile>(connections);
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(ConnectionSelected))]
         private async Task DeleteConnection()
         {
             if (SelectedConnection != null)

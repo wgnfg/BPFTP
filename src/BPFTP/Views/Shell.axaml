@@ -8,6 +8,59 @@
              x:Class="BPFTP.Views.Shell"
 			 x:DataType="vm:ShellViewModel">
 
-	<ContentControl Content="{Binding Content}" />
-	
+	<Grid>
+		<ContentControl Content="{Binding Content}" />
+
+		<Panel Background="#80000000"
+			   IsVisible="{Binding IsDialogVisible}"/>
+
+		<ItemsControl ItemsSource="{Binding Dialogs}"
+					  IsVisible="{Binding IsDialogVisible}"
+					  HorizontalAlignment="Center"
+					  VerticalAlignment="Center">
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Panel>
+						<ContentControl Content="{Binding}" />
+					</Panel>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+
+		<ItemsControl ItemsSource="{Binding Popups}"
+					  HorizontalAlignment="Right"
+					  VerticalAlignment="Bottom"
+					  Margin="15">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel Spacing="10"/>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+
+			<ItemsControl.Styles>
+				<Style Selector="Panel.active">
+					<Setter Property="Opacity" Value="1"/>
+				</Style>
+				<Style Selector="Panel:not(.active)">
+					<Setter Property="Opacity" Value="0"/>
+					<Setter Property="RenderTransform" Value="translateY(100px)"/>
+				</Style>
+			</ItemsControl.Styles>
+
+
+			<ItemsControl.ItemTemplate>
+				<DataTemplate DataType="vm:PopupViewModelBase">
+					<Panel Classes.active="{Binding IsVisible}">
+						<Panel.Transitions>
+							<Transitions>
+								<DoubleTransition Property="Opacity" Duration="0:0:0.1" Easing="CubicEaseOut"/>
+								<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" Easing="CubicEaseOut"/>
+							</Transitions>
+						</Panel.Transitions>
+						<ContentControl Content="{Binding}" />
+					</Panel>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+	</Grid>
 </UserControl>
