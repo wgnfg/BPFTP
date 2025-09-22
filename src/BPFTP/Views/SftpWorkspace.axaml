@@ -8,7 +8,86 @@
 			 xmlns:vm="using:BPFTP.ViewModels"
              x:Class="BPFTP.Views.SftpWorkspace"
 			 x:DataType="vm:SftpWorkspaceViewModel">
-	<Grid RowDefinitions="Auto, *">
+	<UserControl.DataTemplates>
+		<DataTemplate DataType="{x:Type vm:RemoteFolder}">
+			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
+				<StackPanel Spacing="5">
+					<CheckBox IsChecked="{Binding IsSelected}"/>
+					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+				</StackPanel>
+				<Interaction.Behaviors>
+					<EventTriggerBehavior EventName="DoubleTapped">
+						<InvokeCommandAction Command="{Binding $parent[UserControl].DataContext.RemoteExplorer.NavigateIntoCommand}"
+											 CommandParameter="{Binding}"/>
+					</EventTriggerBehavior>
+				</Interaction.Behaviors>
+			</Border>
+		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:RemoteFile}">
+			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
+				<StackPanel Spacing="5">
+					<CheckBox IsChecked="{Binding IsSelected}"/>
+					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+				</StackPanel>
+			</Border>
+		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:LocalFolder}">
+			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
+				<StackPanel Spacing="5">
+					<CheckBox IsChecked="{Binding IsSelected}"/>
+					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+				</StackPanel>
+				<Interaction.Behaviors>
+					<EventTriggerBehavior EventName="DoubleTapped">
+						<InvokeCommandAction Command="{Binding $parent[UserControl].DataContext.LocalExplorer.NavigateIntoCommand}"
+											 CommandParameter="{Binding}"/>
+					</EventTriggerBehavior>
+				</Interaction.Behaviors>
+			</Border>
+		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:LocalFile}">
+			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
+				<StackPanel Spacing="5">
+					<CheckBox IsChecked="{Binding IsSelected}"/>
+					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+				</StackPanel>
+			</Border>
+		</DataTemplate>
+		
+		<DataTemplate DataType="{x:Type vm:ExplorerCommon}">
+			<DockPanel>
+				<Border DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
+					<StackPanel Orientation="Horizontal" Spacing="5">
+						<Button Content="上移" Command="{Binding GoUpCommand}"/>
+						<Button Content="刷" Command="{Binding RefreshCommand}"/>
+						<TextBox Text="{Binding CurPath, Mode=TwoWay}" Watermark="路径" MinWidth="200"/>
+						<TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="搜索" MinWidth="150"/>
+					</StackPanel>
+				</Border>
+				<ScrollViewer>
+					<StackPanel>
+						<TextBlock Text="Folders" FontWeight="Bold" Margin="5"/>
+						<ItemsControl ItemsSource="{Binding FilteredFolders}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<WrapPanel/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+						</ItemsControl>
+						<TextBlock Text="Files" FontWeight="Bold" Margin="5"/>
+						<ItemsControl ItemsSource="{Binding FilteredFiles}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<WrapPanel/>
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+						</ItemsControl>
+					</StackPanel>
+				</ScrollViewer>
+			</DockPanel>
+		</DataTemplate>
+	</UserControl.DataTemplates>
+	<Grid RowDefinitions="Auto, *, Auto, *, Auto">
 		<Border Grid.Row="0" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
 			<DockPanel>
 				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="5">
@@ -26,6 +105,20 @@
 				</StackPanel>
 			</DockPanel>
 		</Border>
+		
+		<DockPanel Grid.Row="1" DataContext="{Binding RemoteExplorer}">
+			<ContentControl DockPanel.Dock="Top" Content="{Binding}" />
+		</DockPanel>
 
+		<!-- Grid Splitter -->
+		<GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Background="LightGray"/>
+
+		<DockPanel Grid.Row="3" DataContext="{Binding LocalExplorer}">
+			<ContentControl DockPanel.Dock="Top" Content="{Binding}" />
+		</DockPanel>
+
+		<Border Grid.Row="4" BorderBrush="Gray" BorderThickness="0 1 0 0" Padding="5,2">
+			
+		</Border>
 	</Grid>
 </UserControl>

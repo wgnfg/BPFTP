@@ -1,7 +1,6 @@
 ﻿using Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-
 namespace BPFTP.Desktop;
 
 class Program
@@ -22,7 +21,8 @@ class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .LogToTrace();
+            .LogToTrace()
+            .UseR3();
 
     public static void ConfigureServices(IServiceCollection services)
     {

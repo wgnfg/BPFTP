@@ -23,7 +23,10 @@ namespace BPFTP.ViewModels
 
         [ObservableProperty]
         private bool _isSelected;
-
-        public bool IsFromRemote { get; set; }
     }
+
+    public partial class RemoteFile : FileItemViewModel;
+    public partial class RemoteFolder : FileItemViewModel;
+    public partial class LocalFile : FileItemViewModel;
+    public partial class LocalFolder : FileItemViewModel;
 }

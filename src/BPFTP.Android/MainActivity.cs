@@ -19,7 +19,8 @@ public class MainActivity : AvaloniaMainActivity<App>
     {
         ConfigureServices(App.ServicesCollection);
         return base.CustomizeAppBuilder(builder)
-            .WithInterFont();
+            .WithInterFont()
+            .UseR3();
     }
 
     public static void ConfigureServices(IServiceCollection services)

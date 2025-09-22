@@ -1,6 +1,10 @@
 ﻿using BPFTP.Models;
 using Renci.SshNet;
+using Renci.SshNet.Sftp;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BPFTP.Services;
@@ -33,6 +37,10 @@ public class SftpService : IDisposable
         _client = new SftpClient(connectionInfo);
         await _client.ConnectAsync(default);
     }
+
+    public IAsyncEnumerable<ISftpFile> ListDirectoryAsync(string path,CancellationToken cancellationToken = default) => 
+        _client?.ListDirectoryAsync(path, cancellationToken);
+
 
     public void Disconnect() => _client?.Disconnect();
 
