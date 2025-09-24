@@ -35,7 +35,7 @@ namespace BPFTP.ViewModels
                 {
                     await SaveOrUpdateConnection(theConnectionProfile);
                 }
-                ViewService.Instance.ShowPopup(new NormalPopupViewModel{ Message = "添加成功"});
+                ViewService.Instance.ShowPopupShort(new NormalPopupViewModel{ Message = "添加成功"});
             }));
         }
 
@@ -51,7 +51,7 @@ namespace BPFTP.ViewModels
                 {
                     await SaveOrUpdateConnection(profileToEdit);
                 }
-                ViewService.Instance.ShowPopup(new NormalPopupViewModel { Message = "修改成功" });
+                ViewService.Instance.ShowPopupShort(new NormalPopupViewModel { Message = "修改成功" });
             }));
         }
 

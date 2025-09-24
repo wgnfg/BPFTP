@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="BPFTP.Views.TransferProgress"
+			 xmlns:vm="clr-namespace:BPFTP.ViewModels"
+             x:DataType="vm:TransferProgressViewModel">
+	<Border Background="AliceBlue"
+          BorderBrush="Gray"
+          BorderThickness="1"
+          CornerRadius="5"
+          Padding="20" MinWidth="350">
+		<StackPanel Spacing="10">
+			<TextBlock Text="{Binding Title}" FontSize="18" FontWeight="Bold"/>
+			<!--<TextBlock>
+				<Run Text="{Binding CurrentFileIndex,UpdateSourceTrigger=PropertyChanged}"/>
+				<Run Text="of"/>
+				<Run Text="{Binding TotalFileCount}"/>
+			</TextBlock>-->
+			<TextBlock Text="{Binding CurrentFileName}" TextWrapping="Wrap" HorizontalAlignment="Left"/>
+			<TextBlock Text="{Binding Percentage,StringFormat='{}{0:F3}%' ,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+			<TextBlock Text="{Binding ErrorMessage}" Foreground="Red" IsVisible="{Binding IsError}"/>
+		</StackPanel>
+	</Border>
+</UserControl>

@@ -13,9 +13,8 @@ namespace BPFTP.ViewModels
 {
     public partial class SftpWorkspaceViewModel
     {
-        public ExplorerCommon RemoteExplorer { get; private set; } = new();
-        public ExplorerCommon LocalExplorer { get; private set; } = new();
-
+        public RemoteExplorer RemoteExplorer { get; private set; } = new RemoteExplorer();
+        public LocalExplorer LocalExplorer { get; private set; } = new LocalExplorer();
 
         private async Task LoadRemoteDirectoryAsync(string path)
         {
@@ -52,13 +51,14 @@ namespace BPFTP.ViewModels
 
         public void InitExplorer()
         {
-            LocalExplorer = new ExplorerCommon()
+            LocalExplorer = new LocalExplorer()
             {
-                UpdateFoldersAndFiles = LoadLocalDirectoryAsync
+                UpdateFoldersAndFiles = LoadLocalDirectoryAsync,
+                CurPath = "D://"
             };
-            RemoteExplorer = new ExplorerCommon()
+            RemoteExplorer = new RemoteExplorer()
             {
-                UpdateFoldersAndFiles = LoadRemoteDirectoryAsync
+                UpdateFoldersAndFiles = LoadRemoteDirectoryAsync,
             };
         }
     }

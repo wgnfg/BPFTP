@@ -15,6 +15,13 @@
 					<CheckBox IsChecked="{Binding IsSelected}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
+				<Border.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="下载"
+								  Command="{Binding $parent[UserControl].DataContext.DownloadItemCommand}"
+								  CommandParameter="{Binding}"/>
+					</ContextMenu>
+				</Border.ContextMenu>
 				<Interaction.Behaviors>
 					<EventTriggerBehavior EventName="DoubleTapped">
 						<InvokeCommandAction Command="{Binding $parent[UserControl].DataContext.RemoteExplorer.NavigateIntoCommand}"
@@ -29,6 +36,13 @@
 					<CheckBox IsChecked="{Binding IsSelected}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
+				<Border.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="下载"
+								  Command="{Binding $parent[UserControl].DataContext.DownloadItemCommand}"
+								  CommandParameter="{Binding}"/>
+					</ContextMenu>
+				</Border.ContextMenu>
 			</Border>
 		</DataTemplate>
 		<DataTemplate DataType="{x:Type vm:LocalFolder}">
@@ -37,6 +51,13 @@
 					<CheckBox IsChecked="{Binding IsSelected}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
+				<Border.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="上传"
+								  Command="{Binding $parent[UserControl].DataContext.UploadItemCommand}"
+								  CommandParameter="{Binding}"/>
+					</ContextMenu>
+				</Border.ContextMenu>
 				<Interaction.Behaviors>
 					<EventTriggerBehavior EventName="DoubleTapped">
 						<InvokeCommandAction Command="{Binding $parent[UserControl].DataContext.LocalExplorer.NavigateIntoCommand}"
@@ -51,10 +72,17 @@
 					<CheckBox IsChecked="{Binding IsSelected}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
+				<Border.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="上传"
+								  Command="{Binding $parent[UserControl].DataContext.UploadItemCommand}"
+								  CommandParameter="{Binding}"/>
+					</ContextMenu>
+				</Border.ContextMenu>
 			</Border>
 		</DataTemplate>
 		
-		<DataTemplate DataType="{x:Type vm:ExplorerCommon}">
+		<DataTemplate DataType="{x:Type vm:RemoteExplorer}">
 			<DockPanel>
 				<Border DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
 					<StackPanel Orientation="Horizontal" Spacing="5">
@@ -62,31 +90,52 @@
 						<Button Content="刷" Command="{Binding RefreshCommand}"/>
 						<TextBox Text="{Binding CurPath, Mode=TwoWay}" Watermark="路径" MinWidth="200"/>
 						<TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="搜索" MinWidth="150"/>
+						<Button Content="批量下载" Command="{Binding $parent[UserControl].DataContext.DownloadManyCommand}"/>
 					</StackPanel>
 				</Border>
 				<ScrollViewer>
 					<StackPanel>
 						<TextBlock Text="Folders" FontWeight="Bold" Margin="5"/>
-						<ItemsControl ItemsSource="{Binding FilteredFolders}">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<WrapPanel/>
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
-						</ItemsControl>
+						<ItemsControl ItemsSource="{Binding FilteredFolders}"/>
 						<TextBlock Text="Files" FontWeight="Bold" Margin="5"/>
-						<ItemsControl ItemsSource="{Binding FilteredFiles}">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<WrapPanel/>
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
-						</ItemsControl>
+						<ItemsControl ItemsSource="{Binding FilteredFiles}"/>
+					</StackPanel>
+				</ScrollViewer>
+			</DockPanel>
+		</DataTemplate>
+		<DataTemplate DataType="{x:Type vm:LocalExplorer}">
+			<DockPanel>
+				<Border DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
+					<StackPanel Orientation="Horizontal" Spacing="5">
+						<Button Content="上移" Command="{Binding GoUpCommand}"/>
+						<Button Content="刷" Command="{Binding RefreshCommand}"/>
+						<TextBox Text="{Binding CurPath, Mode=TwoWay}" Watermark="路径" MinWidth="200"/>
+						<TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="搜索" MinWidth="150"/>
+						<Button Content="批量上传" Command="{Binding $parent[UserControl].DataContext.UploadManyCommand}"/>
+					</StackPanel>
+				</Border>
+				<ScrollViewer>
+					<StackPanel>
+						<TextBlock Text="Folders" FontWeight="Bold" Margin="5"/>
+						<ItemsControl ItemsSource="{Binding FilteredFolders}"/>
+						<TextBlock Text="Files" FontWeight="Bold" Margin="5"/>
+						<ItemsControl ItemsSource="{Binding FilteredFiles}"/>
 					</StackPanel>
 				</ScrollViewer>
 			</DockPanel>
 		</DataTemplate>
 	</UserControl.DataTemplates>
+	<UserControl.Styles>
+		<Style Selector="ItemsControl">
+			<Setter Property="ItemsPanel">
+				<Setter.Value>
+					<ItemsPanelTemplate>
+						<WrapPanel/>
+					</ItemsPanelTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+	</UserControl.Styles>
 	<Grid RowDefinitions="Auto, *, Auto, *, Auto">
 		<Border Grid.Row="0" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
 			<DockPanel>
@@ -110,7 +159,6 @@
 			<ContentControl DockPanel.Dock="Top" Content="{Binding}" />
 		</DockPanel>
 
-		<!-- Grid Splitter -->
 		<GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Background="LightGray"/>
 
 		<DockPanel Grid.Row="3" DataContext="{Binding LocalExplorer}">

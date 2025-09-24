@@ -33,6 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\Popups\TransferProgress.axaml.cs">
+      <DependentUpon>TransferProgress.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\SftpWorkspace.axaml.cs">
       <DependentUpon>SftpWorkspace.axaml</DependentUpon>
     </Compile>

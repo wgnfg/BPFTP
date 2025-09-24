@@ -41,7 +41,7 @@ namespace BPFTP.ViewModels
         }
 
         [RelayCommand]
-        private Task Refresh() => UpdateFoldersAndFiles(CurPath);
+        public Task Refresh() => UpdateFoldersAndFiles(CurPath);
         public Func<string, Task> UpdateFoldersAndFiles { get; set; } = (_) => Task.CompletedTask;
         public ExplorerCommon()
         {
@@ -59,4 +59,7 @@ namespace BPFTP.ViewModels
         }
 
     }
+
+    public partial class RemoteExplorer:ExplorerCommon;
+    public partial class LocalExplorer:ExplorerCommon;
 }

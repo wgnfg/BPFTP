@@ -50,7 +50,8 @@ namespace BPFTP.Services
             }
         }
 
-        public void ShowPopup(PopupViewModelBase viewModel,int autoCloseDelay = 1000)
+        public void ShowPopupShort(PopupViewModelBase viewModel, int autoCloseDelay = 1000) => ShowPopup(viewModel, autoCloseDelay);
+        public void ShowPopup(PopupViewModelBase viewModel,int autoCloseDelay = 0)
         {
             if (_shellViewModel == null) return;
             if (!_shellViewModel.Popups.Contains(viewModel))
