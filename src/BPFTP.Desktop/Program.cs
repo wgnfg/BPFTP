@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Microsoft.Extensions.DependencyInjection;
+using SqlSugar;
 using System;
 namespace BPFTP.Desktop;
 
@@ -11,6 +12,7 @@ class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        StaticConfig.EnableAot = true;
         ConfigureServices(App.ServicesCollection);
         BuildAvaloniaApp()
         .StartWithClassicDesktopLifetime(args);

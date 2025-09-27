@@ -7,12 +7,18 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+	  <PublishAot>true</PublishAot>
+	  <TrimMode>full</TrimMode>
+	  <InvariantGlobalization>false</InvariantGlobalization>
+	  <IlcOptimizationPreference>Space</IlcOptimizationPreference>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="11.3.6" />
   </ItemGroup>
-
+	<ItemGroup>
+		<RdXmlFile Include="rd.xml" />
+	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BPFTP\BPFTP.csproj" />
   </ItemGroup>
