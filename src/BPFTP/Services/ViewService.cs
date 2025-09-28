@@ -1,4 +1,6 @@
-﻿using BPFTP.ViewModels;
+﻿using Avalonia.Threading;
+using BPFTP.ViewModels;
+using R3;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,9 +23,9 @@ namespace BPFTP.Services
             _shellViewModel = vm;
         }
 
-        public Task ShowDialogAsync(DialogViewModelBase viewModel)
+        public static Task ShowDialogAsync(DialogViewModelBase viewModel)
         {
-            if (_shellViewModel == null)
+            if (Instance._shellViewModel == null)
             {
                 return Task.CompletedTask;
             }
@@ -31,49 +33,57 @@ namespace BPFTP.Services
             return viewModel.DialogCloseTCS.Task;
         }
 
-        public void ShowDialog(DialogViewModelBase viewModel)
+        public static void ShowDialog(DialogViewModelBase viewModel)
         {
-            if (_shellViewModel == null) return;
-            if (!_shellViewModel.Dialogs.Contains(viewModel))
+            if (Instance._shellViewModel == null) return;
+            if (!Instance._shellViewModel.Dialogs.Contains(viewModel))
             {
-                _shellViewModel.Dialogs.Add(viewModel);
+                Instance._shellViewModel.Dialogs.Add(viewModel);
             }
         }
 
-        public void HideDialog(DialogViewModelBase viewModel)
+        public static void HideDialog(DialogViewModelBase viewModel)
         {
-            if (_shellViewModel == null) return;
-            if (_shellViewModel.Dialogs.Contains(viewModel))
+            if (Instance._shellViewModel == null) return;
+            if (Instance._shellViewModel.Dialogs.Contains(viewModel))
             {
-                _shellViewModel.Dialogs.Remove(viewModel);
+                Instance._shellViewModel.Dialogs.Remove(viewModel);
                 viewModel.DialogCloseTCS.SetResult();
             }
         }
 
-        public void ShowPopupShort(PopupViewModelBase viewModel, int autoCloseDelay = 1000) => ShowPopup(viewModel, autoCloseDelay);
-        public void ShowPopup(PopupViewModelBase viewModel,int autoCloseDelay = 0)
+        public static void ShowPopupShort(PopupViewModelBase viewModel, int autoCloseDelay = 2500) => ShowPopup(viewModel, autoCloseDelay);
+        public static void ShowPopup(PopupViewModelBase viewModel,int autoCloseDelay = 0)
         {
-            if (_shellViewModel == null) return;
-            if (!_shellViewModel.Popups.Contains(viewModel))
+            if (Instance._shellViewModel == null) return;
+            if (!Instance._shellViewModel.Popups.Contains(viewModel))
             {
-                _shellViewModel.Popups.Add(viewModel);
+                Instance._shellViewModel.Popups.Add(viewModel);
             }
             Task.Delay(100).ContinueWith(_ =>  viewModel.IsVisible = true);
             if (autoCloseDelay > 0)
             {
-                Task.Delay(autoCloseDelay).ContinueWith(_ => viewModel.IsVisible = false);
+                Task.Delay(autoCloseDelay).ContinueWith(_ => HidePopup(viewModel));
             }
         }
 
-        public async void HidePopup(PopupViewModelBase viewModel)
+        public static async void HidePopup(PopupViewModelBase viewModel)
         {
-            if (_shellViewModel == null) return;
+            if (Instance._shellViewModel == null) return;
 
             viewModel.IsVisible = false;
-            // Wait for the animation to complete before removing
-            await Task.Delay(300); // This duration should match the animation duration
+            await Task.Delay(300);
 
-            _shellViewModel.Popups.Remove(viewModel);
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                Instance._shellViewModel.Popups.Remove(viewModel);
+            });
+        }
+
+        public static IDisposable PopupScope(PopupViewModelBase viewModel, int autoCloseDelay = 0)
+        {
+            ShowPopup(viewModel, autoCloseDelay);
+            return Disposable.Create(() => HidePopup(viewModel));
         }
     }
 

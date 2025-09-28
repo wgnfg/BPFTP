@@ -21,7 +21,8 @@ namespace BPFTP.ViewModels
 
         [ObservableProperty]
         private bool _isDialogVisible;
-
+        [ObservableProperty]
+        public ViewModelBase _leftContent;
         public ObservableCollection<PopupViewModelBase> Popups { get; } = [];
         public ObservableCollection<ViewModelBase> Dialogs { get; } = [];
 

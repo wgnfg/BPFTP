@@ -18,13 +18,13 @@ namespace BPFTP.ViewModels
         async Task OnConfirm()
         {
             await OnConfrimOption.Invoke();
-            ViewService.Instance.HideDialog(this);
+            ViewService.HideDialog(this);
         }
         [RelayCommand]
         async Task OnCancel()
         {
             await OnCancelOption.Invoke();
-            ViewService.Instance.HideDialog(this);
+            ViewService.HideDialog(this);
         }
     }
 }

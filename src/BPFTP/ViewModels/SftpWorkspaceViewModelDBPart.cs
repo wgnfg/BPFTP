@@ -29,13 +29,13 @@ namespace BPFTP.ViewModels
         private async Task AddConnection()
         {
             var theConnectionProfile = new ConnectionProfile();
-            await ViewService.Instance.ShowDialogAsync(new EditConnectionViewModel(theConnectionProfile, OnConfirm: async () =>
+            await ViewService.ShowDialogAsync(new EditConnectionViewModel(theConnectionProfile, OnConfirm: async () =>
             {
                 if (theConnectionProfile != null)
                 {
                     await SaveOrUpdateConnection(theConnectionProfile);
                 }
-                ViewService.Instance.ShowPopupShort(new NormalPopupViewModel{ Message = "添加成功"});
+                ViewService.ShowPopupShort(new NormalPopupViewModel{ Message = "添加成功"});
             }));
         }
 
@@ -45,13 +45,13 @@ namespace BPFTP.ViewModels
             if (SelectedConnection == null) return;
             var profileToEdit = SelectedConnection.Clone();
             var vm = new EditConnectionViewModel(profileToEdit);
-            await ViewService.Instance.ShowDialogAsync(new EditConnectionViewModel(profileToEdit, OnConfirm: async () =>
+            await ViewService.ShowDialogAsync(new EditConnectionViewModel(profileToEdit, OnConfirm: async () =>
             {
                 if (profileToEdit != null)
                 {
                     await SaveOrUpdateConnection(profileToEdit);
                 }
-                ViewService.Instance.ShowPopupShort(new NormalPopupViewModel { Message = "修改成功" });
+                ViewService.ShowPopupShort(new NormalPopupViewModel { Message = "修改成功" });
             }));
         }
 

@@ -12,7 +12,7 @@
 		<DataTemplate DataType="{x:Type vm:RemoteFolder}">
 			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
 				<StackPanel Spacing="5">
-					<CheckBox IsChecked="{Binding IsSelected}"/>
+					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
 				<Border.ContextMenu>
@@ -33,7 +33,7 @@
 		<DataTemplate DataType="{x:Type vm:RemoteFile}">
 			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
 				<StackPanel Spacing="5">
-					<CheckBox IsChecked="{Binding IsSelected}"/>
+					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
 				<Border.ContextMenu>
@@ -48,7 +48,7 @@
 		<DataTemplate DataType="{x:Type vm:LocalFolder}">
 			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
 				<StackPanel Spacing="5">
-					<CheckBox IsChecked="{Binding IsSelected}"/>
+					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
 				<Border.ContextMenu>
@@ -69,7 +69,7 @@
 		<DataTemplate DataType="{x:Type vm:LocalFile}">
 			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
 				<StackPanel Spacing="5">
-					<CheckBox IsChecked="{Binding IsSelected}"/>
+					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
 				<Border.ContextMenu>
@@ -81,7 +81,6 @@
 				</Border.ContextMenu>
 			</Border>
 		</DataTemplate>
-		
 		<DataTemplate DataType="{x:Type vm:RemoteExplorer}">
 			<DockPanel>
 				<Border DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">

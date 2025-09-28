@@ -26,16 +26,13 @@
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
 		</ItemsControl>
+		
+		<ContentControl Content="{Binding LeftContent}"/>
 
 		<ItemsControl ItemsSource="{Binding Popups}"
 					  HorizontalAlignment="Right"
 					  VerticalAlignment="Bottom"
 					  Margin="15">
-			<ItemsControl.ItemsPanel>
-				<ItemsPanelTemplate>
-					<StackPanel Spacing="10"/>
-				</ItemsPanelTemplate>
-			</ItemsControl.ItemsPanel>
 
 			<ItemsControl.Styles>
 				<Style Selector="Panel.active">
@@ -58,9 +55,16 @@
 							</Transitions>
 						</Panel.Transitions>
 						<ContentControl Content="{Binding}" />
+					
 					</Panel>
 				</DataTemplate>
 			</ItemsControl.ItemTemplate>
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel Orientation="Vertical" Spacing="10">
+					</StackPanel>
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
 		</ItemsControl>
 	</Grid>
 </UserControl>

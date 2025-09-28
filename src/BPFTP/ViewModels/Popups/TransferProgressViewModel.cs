@@ -1,8 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using R3;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BPFTP.ViewModels
@@ -30,7 +33,14 @@ namespace BPFTP.ViewModels
         private string _errorMessage = string.Empty;
 
 
-
+        private readonly CancellationTokenSource CancellationTokenSource = new();
+        public CancellationToken CancellationToken => CancellationTokenSource.Token;
         public bool IsError => !string.IsNullOrEmpty(ErrorMessage);
+
+        [RelayCommand]
+        public void Cancel()
+        {
+            CancellationTokenSource.Cancel();
+        }
     }
 }

@@ -28,11 +28,13 @@ namespace BPFTP.ViewModels
             if (SelectedConnection == null) return;
             try
             {
-                await _sftpService.ConnectAsync(SelectedConnection);
+                await _sftpService.Connect2Async(SelectedConnection);
                 RemoteExplorer.CurPath = "/";
+                ViewService.ShowPopupShort(new NormalPopupViewModel() { Message = $"连接成功" });
             }
             catch (Exception ex)
             {
+                ViewService.ShowPopupShort(new NormalPopupViewModel() { Message = $"连接失败:{ex.Message}" });
             }
         }
 

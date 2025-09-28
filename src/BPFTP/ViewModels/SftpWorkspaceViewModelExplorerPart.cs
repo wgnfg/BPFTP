@@ -23,15 +23,19 @@ namespace BPFTP.ViewModels
             {
                 List<FileItemViewModel> newFolders = [];
                 List<FileItemViewModel> newFiles = [];
-                await foreach(var item in _sftpService.ListDirectoryAsync(path))
+                IAsyncEnumerable<Renci.SshNet.Sftp.ISftpFile>? items = _sftpService.ListDirectoryAsync(path);
+                if (items != null)
                 {
-                    if (item.IsDirectory && item.Name != "." && item.Name != "..")
+                    await foreach (var item in items)
                     {
-                        newFolders.Add(new RemoteFolder { Name = item.Name, Path = item.FullName, IsDirectory = true, Size = item.Length});
-                    }
-                    else if (!item.IsDirectory)
-                    {
-                        newFiles.Add(new RemoteFile { Name = item.Name, Path = item.FullName, IsDirectory = false, Size = item.Length});
+                        if (item.IsDirectory && item.Name != "." && item.Name != "..")
+                        {
+                            newFolders.Add(new RemoteFolder { Name = item.Name, Path = item.FullName, IsDirectory = true, Size = item.Length });
+                        }
+                        else if (!item.IsDirectory)
+                        {
+                            newFiles.Add(new RemoteFile { Name = item.Name, Path = item.FullName, IsDirectory = false, Size = item.Length });
+                        }
                     }
                 }
                 RemoteExplorer.AllFolders = newFolders;

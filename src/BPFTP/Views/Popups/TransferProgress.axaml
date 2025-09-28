@@ -21,6 +21,7 @@
 			<TextBlock Text="{Binding CurrentFileName}" TextWrapping="Wrap" HorizontalAlignment="Left"/>
 			<TextBlock Text="{Binding Percentage,StringFormat='{}{0:F3}%' ,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
 			<TextBlock Text="{Binding ErrorMessage}" Foreground="Red" IsVisible="{Binding IsError}"/>
+			<Button Content="取消" Command="{Binding Cancel}"/>
 		</StackPanel>
 	</Border>
 </UserControl>
