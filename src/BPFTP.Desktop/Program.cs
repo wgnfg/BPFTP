@@ -1,4 +1,6 @@
 ﻿using Avalonia;
+using BPFTP.Desktop.Services;
+using BPFTP.Services;
 using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 using System;
@@ -28,6 +30,7 @@ class Program
 
     public static void ConfigureServices(IServiceCollection services)
     {
+        services.AddSingleton<IPermissionService, DesktopPermissionService>();
     }
 
 }

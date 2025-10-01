@@ -6,7 +6,7 @@
 			 xmlns:vm="clr-namespace:BPFTP.ViewModels"
              x:Class="BPFTP.Views.EditConnection"
 			 x:DataType="vm:EditConnectionViewModel">
-	<Border Background="White"
+	<Border Background="Gray"
 			BorderBrush="Gray"
 			BorderThickness="1"
 			CornerRadius="5"

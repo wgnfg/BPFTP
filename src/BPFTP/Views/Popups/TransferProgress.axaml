@@ -6,7 +6,7 @@
              x:Class="BPFTP.Views.TransferProgress"
 			 xmlns:vm="clr-namespace:BPFTP.ViewModels"
              x:DataType="vm:TransferProgressViewModel">
-	<Border Background="AliceBlue"
+	<Border Background="{DynamicResource ThemeBackgroundBrush}"
           BorderBrush="Gray"
           BorderThickness="1"
           CornerRadius="5"

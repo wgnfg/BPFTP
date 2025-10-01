@@ -217,12 +217,13 @@ namespace BPFTP.ViewModels
             try
             {
                 await _sftpService.DownloadFileObservable(item.Path, localPath)
-                    .ThrottleLast(TimeSpan.FromMilliseconds(200))
+                    .ThrottleLast(TimeSpan.FromMilliseconds(20))
                     .ForEachAsync(progress =>
                         onProgress(new DownloadProgress { Percentage = progress.TotalBytes > 0 ? (double)progress.BytesDownloaded / progress.TotalBytes * 100 : 0 }),
                         cancellationToken);
             }
             catch (Exception ex) {
+                ViewService.ShowPopupShort(new NormalPopupViewModel() { Message = $"下载失败:{ex.Message}" });
             }
         }
 
@@ -231,7 +232,6 @@ namespace BPFTP.ViewModels
             try
             {
                 await _sftpService.DownloadDirectoryObservable(item.Path, localPath)
-                    .ThrottleLast(TimeSpan.FromMilliseconds(200))
                     .ForEachAsync(progress => onProgress(new() { Name = progress.CurrentFile, Percentage = progress.Percentage }), cancellationToken);
             }
             catch (Exception ex)

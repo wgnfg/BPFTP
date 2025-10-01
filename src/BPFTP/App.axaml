@@ -10,4 +10,10 @@
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+    <Application.Resources>
+        <!-- 目前不带似乎会导致安卓平台下无法正常显示字体 -->
+        <FontFamily x:Key="DefaultFontFamily">Microsoft YaHei</FontFamily>
+	    <FontFamily x:Key="ContentControlThemeFontFamily">Microsoft YaHei</FontFamily>
+        <FontFamily x:Key="TextBlockThemeFontFamily">Microsoft YaHei</FontFamily>
+    </Application.Resources>
 </Application>

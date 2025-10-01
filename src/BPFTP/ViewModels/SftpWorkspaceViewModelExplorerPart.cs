@@ -46,6 +46,16 @@ namespace BPFTP.ViewModels
         }
         private async Task LoadLocalDirectoryAsync(string path)
         {
+            if (_permissionService != null)
+            {
+                var granted = await _permissionService.RequestStoragePermissionAsync();
+                if (!granted)
+                {
+                    ViewService.ShowPopupShort(new NormalPopupViewModel() { Message = "获取权限失败" });
+                    return;
+                }
+            }
+
             var (directories, files) = await _fileService.ListDirectoryAsync(path);
             LocalExplorer.AllFolders = [.. directories.Select(d => new LocalFolder { Name = d.Name, Path = d.FullName, IsDirectory = true }).OrderBy(d => d.Name)];
             LocalExplorer.AllFiles = [.. files.Select(f => new LocalFile { Name = f.Name, Path = f.FullName, IsDirectory = false, Size = f.Length }).OrderBy(f => f.Name)];
@@ -58,7 +68,7 @@ namespace BPFTP.ViewModels
             LocalExplorer = new LocalExplorer()
             {
                 UpdateFoldersAndFiles = LoadLocalDirectoryAsync,
-                CurPath = "D://"
+                CurPath = Environment.CurrentDirectory
             };
             RemoteExplorer = new RemoteExplorer()
             {

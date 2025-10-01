@@ -6,7 +6,7 @@
 			 mc:Ignorable="d" 
              x:Class="BPFTP.Views.NormalPopup"
 			 x:DataType="vm:NormalPopupViewModel">
-	<Border MinWidth="200" Height="100" BorderBrush="Black" BorderThickness="2" CornerRadius="10" Background="White">
+	<Border MinWidth="200" Height="100" BorderBrush="Black" BorderThickness="2" CornerRadius="10" Background="{DynamicResource ThemeBackgroundBrush}">
 		<TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="{Binding Message}"/>
 	</Border>
 </UserControl>
