@@ -1,5 +1,8 @@
 <Solution>
-  <Project Path="BPFTP.Android/BPFTP.Android.csproj" />
+  <Folder Name="/Solution Items/" />
+  <Project Path="BPFTP.Android/BPFTP.Android.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
   <Project Path="BPFTP.Desktop/BPFTP.Desktop.csproj" />
   <Project Path="BPFTP.iOS/BPFTP.iOS.csproj" />
   <Project Path="BPFTP/BPFTP.csproj" />
