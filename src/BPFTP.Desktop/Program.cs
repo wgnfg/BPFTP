@@ -4,8 +4,10 @@ using BPFTP.Services;
 using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 using System;
+using System.Runtime.Versioning;
 namespace BPFTP.Desktop;
 
+[SupportedOSPlatform("windows")]
 class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -27,10 +29,10 @@ class Program
             .WithInterFont()
             .LogToTrace()
             .UseR3();
-
     public static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IPermissionService, DesktopPermissionService>();
+        services.AddSingleton<ISecureCredentialService, DesktopSecureCredentialService>();
     }
 
 }

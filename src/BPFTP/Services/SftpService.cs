@@ -19,8 +19,9 @@ public readonly record struct UploadProgress(long BytesUploaded, long TotalBytes
 public readonly record struct DirectoryDownloadProgress(string CurrentFile, double Percentage);
 public readonly record struct DirectoryUploadProgress(string CurrentFile, double Percentage);
 
-public class SftpService : IDisposable
+public class SftpService(ISecureCredentialService secureCredentialService) : IDisposable
 {
+    private readonly ISecureCredentialService _secureCredentialService = secureCredentialService;
     private SftpClient? _client;
 
     public int WaitTimeForUpload = 1000;
@@ -39,15 +40,16 @@ public class SftpService : IDisposable
     public async Task<DisposeWrapper<SftpClient>> ConnectAsync(ConnectionProfile profile, CancellationToken cancellationToken = default)
     {
         AuthenticationMethod authMethod;
+
         if (profile.AuthMethod == AuthroizeMethod.SSH && !string.IsNullOrEmpty(profile.PrivateKeyPath))
         {
-            var keyPassword = profile.PrivateKeyPassword;
+            var keyPassword = await _secureCredentialService!.RetrieveCredentialAsync($"profile-{profile.Id}-keypassword") ?? profile.PrivateKeyPassword;
             var keyFile = new PrivateKeyFile(profile.PrivateKeyPath, keyPassword ?? string.Empty);
             authMethod = new PrivateKeyAuthenticationMethod(profile.Username, keyFile);
         }
         else
         {
-            var password = profile.Password;
+            var password = await _secureCredentialService!.RetrieveCredentialAsync($"profile-{profile.Id}-password") ?? profile.Password;
             authMethod = new PasswordAuthenticationMethod(profile.Username, password ?? string.Empty);
         }
 

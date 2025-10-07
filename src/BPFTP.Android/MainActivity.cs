@@ -29,6 +29,8 @@ public class MainActivity : AvaloniaMainActivity<App>
     public static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<IPermissionService, AndroidPermissionService>();
+        services.AddSingleton<ISecureCredentialService, AndroidSecureCredentialService>();
+
     }
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)

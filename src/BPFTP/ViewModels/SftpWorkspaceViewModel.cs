@@ -7,14 +7,15 @@ namespace BPFTP.ViewModels
 {
     public partial class SftpWorkspaceViewModel : ViewModelBase
     {
-        public SftpWorkspaceViewModel(DatabaseService databaseService, SftpService sftpService, ViewService viewService, FileService fileService, IPermissionService permissionService)
+        public SftpWorkspaceViewModel(DatabaseService databaseService, SftpService sftpService, ViewService viewService, FileService fileService, IPermissionService permissionService, ISecureCredentialService secureCredentialService)
         {
             _databaseService = databaseService;
             _sftpService = sftpService;
             _viewService = viewService;
             _fileService = fileService;
             _permissionService = permissionService;
-            _ = InitializeAsync();
+            _secureCredentialService = secureCredentialService;
+            _ = InitConnectionItemsAsync();
             InitExplorer();
         }
         private readonly DatabaseService _databaseService;
@@ -22,6 +23,7 @@ namespace BPFTP.ViewModels
         private readonly ViewService _viewService;
         private readonly FileService _fileService;
         private readonly IPermissionService _permissionService;
+        private readonly ISecureCredentialService _secureCredentialService;
         private bool ConnectionSelected() => SelectedConnection != null;
         [RelayCommand(CanExecute = nameof(ConnectionSelected))]
         private async Task Connect()

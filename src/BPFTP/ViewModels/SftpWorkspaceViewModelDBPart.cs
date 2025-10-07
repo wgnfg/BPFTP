@@ -57,11 +57,19 @@ namespace BPFTP.ViewModels
 
         private async Task SaveOrUpdateConnection(ConnectionProfile profile)
         {
+
+            // Store credentials securely first.
+            await StoreCredentialsAsync(profile);
+
+            // Clear credentials from the profile object before saving to the database.
+            profile.Password = string.Empty;
+            profile.PrivateKeyPassword = string.Empty;
+
             await _databaseService.SaveConnectionAsync(profile);
-            await InitializeAsync();
+            await InitConnectionItemsAsync();
         }
 
-        private async Task InitializeAsync()
+        private async Task InitConnectionItemsAsync()
         {
             var connections = await _databaseService.GetConnectionsAsync();
             Connections = new ObservableCollection<ConnectionProfile>(connections);
@@ -73,8 +81,28 @@ namespace BPFTP.ViewModels
             if (SelectedConnection != null)
             {
                 await _databaseService.DeleteConnectionAsync(SelectedConnection.Id);
-                await InitializeAsync();
+                await InitConnectionItemsAsync();
             }
         }
+
+        private async Task StoreCredentialsAsync(ConnectionProfile profile)
+        {
+            // The profile must have an ID to create a unique key.
+            // If it's a new profile, SaveConnectionAsync should assign one.
+            if (profile.Id == 0)
+            {
+                await _databaseService.SaveConnectionAsync(profile);
+            }
+
+            if (!string.IsNullOrEmpty(profile.Password))
+            {
+                await _secureCredentialService.StoreCredentialAsync($"profile-{profile.Id}-password", profile.Password);
+            }
+
+            if (!string.IsNullOrEmpty(profile.PrivateKeyPassword))
+            {
+                await _secureCredentialService.StoreCredentialAsync($"profile-{profile.Id}-keypassword", profile.PrivateKeyPassword);
+            }
+        }   
     }
 }
