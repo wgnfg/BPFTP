@@ -1,7 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.Input;
+﻿using Avalonia.Xaml.Interactions.DragAndDrop;
+using BPFTP.Handlers;
 using BPFTP.Services;
+using CommunityToolkit.Mvvm.Input;
+using System;
+using System.Threading.Tasks;
 
 namespace BPFTP.ViewModels
 {
@@ -15,6 +17,8 @@ namespace BPFTP.ViewModels
             _fileService = fileService;
             _permissionService = permissionService;
             _secureCredentialService = secureCredentialService;
+            RemoteDropHandler = new RemoteDropHandler(this);
+            LocalDropHandler = new LocalDropHandler(this);
             _ = InitConnectionItemsAsync();
             InitExplorer();
         }
@@ -25,6 +29,8 @@ namespace BPFTP.ViewModels
         private readonly IPermissionService _permissionService;
         private readonly ISecureCredentialService _secureCredentialService;
         private bool ConnectionSelected() => SelectedConnection != null;
+        public IDropHandler RemoteDropHandler { get; }
+        public IDropHandler LocalDropHandler { get; }
         [RelayCommand(CanExecute = nameof(ConnectionSelected))]
         private async Task Connect()
         {

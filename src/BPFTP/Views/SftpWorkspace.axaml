@@ -23,6 +23,7 @@
 					</ContextMenu>
 				</Border.ContextMenu>
 				<Interaction.Behaviors>
+					<drag:ContextDragBehavior Context="{Binding}"/>
 					<EventTriggerBehavior EventName="DoubleTapped">
 						<InvokeCommandAction Command="{Binding $parent[UserControl].DataContext.RemoteExplorer.NavigateIntoCommand}"
 											 CommandParameter="{Binding}"/>
@@ -43,6 +44,9 @@
 								  CommandParameter="{Binding}"/>
 					</ContextMenu>
 				</Border.ContextMenu>
+				<Interaction.Behaviors>
+					<drag:ContextDragBehavior Context="{Binding}"/>
+				</Interaction.Behaviors>
 			</Border>
 		</DataTemplate>
 		<DataTemplate DataType="{x:Type vm:LocalFolder}">
@@ -63,6 +67,7 @@
 						<InvokeCommandAction Command="{Binding $parent[UserControl].DataContext.LocalExplorer.NavigateIntoCommand}"
 											 CommandParameter="{Binding}"/>
 					</EventTriggerBehavior>
+					<drag:ContextDragBehavior Context="{Binding}"/>
 				</Interaction.Behaviors>
 			</Border>
 		</DataTemplate>
@@ -79,6 +84,9 @@
 								  CommandParameter="{Binding}"/>
 					</ContextMenu>
 				</Border.ContextMenu>
+				<Interaction.Behaviors>
+					<drag:ContextDragBehavior Context="{Binding}"/>
+				</Interaction.Behaviors>
 			</Border>
 		</DataTemplate>
 		<DataTemplate DataType="{x:Type vm:RemoteExplorer}">
@@ -156,12 +164,18 @@
 		
 		<DockPanel Grid.Row="1" DataContext="{Binding RemoteExplorer}">
 			<ContentControl DockPanel.Dock="Top" Content="{Binding}" />
+			<Interaction.Behaviors>
+				<drag:ContextDropBehavior Handler="{Binding $parent[UserControl].DataContext.RemoteDropHandler}"/>
+			</Interaction.Behaviors>
 		</DockPanel>
 
 		<GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch" Background="LightGray"/>
 
 		<DockPanel Grid.Row="3" DataContext="{Binding LocalExplorer}">
 			<ContentControl DockPanel.Dock="Top" Content="{Binding}" />
+			<Interaction.Behaviors>
+				<drag:ContextDropBehavior Handler="{Binding $parent[UserControl].DataContext.RemoteDropHandler}"/>
+			</Interaction.Behaviors>
 		</DockPanel>
 
 		<Border Grid.Row="4" BorderBrush="Gray" BorderThickness="0 1 0 0" Padding="5,2">

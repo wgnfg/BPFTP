@@ -24,9 +24,10 @@ namespace BPFTP.ViewModels
         [ObservableProperty]
         private bool _isSelected;
     }
-
-    public partial class RemoteFile : FileItemViewModel;
-    public partial class RemoteFolder : FileItemViewModel;
-    public partial class LocalFile : FileItemViewModel;
-    public partial class LocalFolder : FileItemViewModel;
+    public interface IRemoteItem;
+    public interface ILocalItem;
+    public partial class RemoteFile : FileItemViewModel,IRemoteItem;
+    public partial class RemoteFolder : FileItemViewModel,IRemoteItem;
+    public partial class LocalFile : FileItemViewModel,ILocalItem;
+    public partial class LocalFolder : FileItemViewModel, ILocalItem;
 }
