@@ -7,7 +7,7 @@ namespace BPFTP.ViewModels
 {
     public partial class SftpWorkspaceViewModel : ViewModelBase
     {
-        public SftpWorkspaceViewModel(DatabaseService databaseService, SftpService sftpService, ViewService viewService, FileService fileService, IPermissionService permissionService, ISecureCredentialService secureCredentialService)
+        public SftpWorkspaceViewModel(DatabaseService databaseService, SftpService sftpService, IViewService viewService, FileService fileService, IPermissionService permissionService, ISecureCredentialService secureCredentialService)
         {
             _databaseService = databaseService;
             _sftpService = sftpService;
@@ -20,7 +20,7 @@ namespace BPFTP.ViewModels
         }
         private readonly DatabaseService _databaseService;
         private readonly SftpService _sftpService;
-        private readonly ViewService _viewService;
+        private readonly IViewService _viewService;
         private readonly FileService _fileService;
         private readonly IPermissionService _permissionService;
         private readonly ISecureCredentialService _secureCredentialService;
@@ -33,11 +33,11 @@ namespace BPFTP.ViewModels
             {
                 await _sftpService.Connect2Async(SelectedConnection);
                 RemoteExplorer.CurPath = "/";
-                ViewService.ShowPopupShort(new NormalPopupViewModel() { Message = $"连接成功" });
+                ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = $"连接成功" });
             }
             catch (Exception ex)
             {
-                ViewService.ShowPopupShort(new NormalPopupViewModel() { Message = $"连接失败:{ex.Message}" });
+                ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = $"连接失败:{ex.Message}" });
             }
         }
 

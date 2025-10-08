@@ -51,7 +51,7 @@ namespace BPFTP.ViewModels
                 var granted = await _permissionService.RequestStoragePermissionAsync();
                 if (!granted)
                 {
-                    ViewService.ShowPopupShort(new NormalPopupViewModel() { Message = "获取权限失败" });
+                    ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = "获取权限失败" });
                     return;
                 }
             }

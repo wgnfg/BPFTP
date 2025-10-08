@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using BPFTP.Desktop.Services;
 using BPFTP.Services;
+using BPFTP.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 using System;
@@ -31,6 +32,7 @@ class Program
             .UseR3();
     public static void ConfigureServices(IServiceCollection services)
     {
+        services.AddSingleton<SftpWorkspaceViewModel, SftpWorkspaceViewModel>();
         services.AddSingleton<IPermissionService, DesktopPermissionService>();
         services.AddSingleton<ISecureCredentialService, DesktopSecureCredentialService>();
     }

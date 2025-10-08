@@ -20,7 +20,7 @@ namespace BPFTP.ViewModels
             {
                 if (item == null || !_sftpService.IsConnected) return;
                 var progressVm = new TransferProgressViewModel { Title = $"上传: {item.Name}" };
-                using (var scope = ViewService.PopupScope(progressVm))
+                using (var scope = ViewOperation.PopupScope(progressVm))
                 {
                     if (item.IsDirectory)
                     {
@@ -51,7 +51,7 @@ namespace BPFTP.ViewModels
             {
                 var localPath = Path.Combine(LocalExplorer.CurPath, item.Name);
                 var progressVm = new TransferProgressViewModel { Title = $"下载: {item.Name}" };
-                using var scope = ViewService.PopupScope(progressVm);
+                using var scope = ViewOperation.PopupScope(progressVm);
                 if (item.IsDirectory)
                 {
                     await DownloadDirectoryAsync(item, localPath, progress =>
@@ -81,7 +81,7 @@ namespace BPFTP.ViewModels
                 if (selectedItems.Count == 0 || !_sftpService.IsConnected) return;
 
                 var progressVm = new TransferProgressViewModel { Title = "批量上传" };
-                using var scope = ViewService.PopupScope(progressVm);
+                using var scope = ViewOperation.PopupScope(progressVm);
                 try
                 {
                     var totalItems = selectedItems.Count;
@@ -135,7 +135,7 @@ namespace BPFTP.ViewModels
                 if (!selectedItems.Any() || !_sftpService.IsConnected) return;
 
                 var progressVm = new TransferProgressViewModel { Title = "Batch Downloading..." };
-                using var _ = ViewService.PopupScope(progressVm);
+                using var _ = ViewOperation.PopupScope(progressVm);
 
                 try
                 {
@@ -223,7 +223,7 @@ namespace BPFTP.ViewModels
                         cancellationToken);
             }
             catch (Exception ex) {
-                ViewService.ShowPopupShort(new NormalPopupViewModel() { Message = $"下载失败:{ex.Message}" });
+                ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = $"下载失败:{ex.Message}" });
             }
         }
 

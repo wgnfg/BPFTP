@@ -16,9 +16,6 @@ namespace BPFTP.ViewModels
         [ObservableProperty]
         ViewModelBase _content = App.ServiceProvider!.GetService<SftpWorkspaceViewModel>()!;
 
-        private readonly ViewService _viewService;
-
-
         [ObservableProperty]
         private bool _isDialogVisible;
         [ObservableProperty]
@@ -26,11 +23,9 @@ namespace BPFTP.ViewModels
         public ObservableCollection<PopupViewModelBase> Popups { get; } = [];
         public ObservableCollection<ViewModelBase> Dialogs { get; } = [];
 
-        public ShellViewModel(ViewService viewService)
+        public ShellViewModel(IViewService viewService)
         {
-            _viewService = viewService;
-            _viewService.RegisterShell(this);
-
+            viewService.RegisterShell(this);
             Dialogs.CollectionChanged += OnDialogsChanged;
         }
 

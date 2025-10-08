@@ -5,6 +5,7 @@ using Avalonia;
 using Avalonia.Android;
 using BPFTP.Android.Services;
 using BPFTP.Services;
+using BPFTP.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BPFTP.Android;
@@ -28,6 +29,7 @@ public class MainActivity : AvaloniaMainActivity<App>
 
     public static void ConfigureServices(IServiceCollection services)
     {
+        services.AddSingleton<SftpWorkspaceViewModel, SftpWorkspaceForAndroidViewModel>();
         services.AddSingleton<IPermissionService, AndroidPermissionService>();
         services.AddSingleton<ISecureCredentialService, AndroidSecureCredentialService>();
 

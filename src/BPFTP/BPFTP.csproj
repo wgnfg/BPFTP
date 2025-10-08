@@ -10,25 +10,28 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia"/>
-    <PackageReference Include="Avalonia.Themes.Fluent"  />
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Avalonia.Fonts.Inter" />
-    <PackageReference Include="CommunityToolkit.Mvvm"/>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
 
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics"/>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
     <PackageReference Include="R3" />
-    <PackageReference Include="R3Extensions.Avalonia"/>
-    <PackageReference Include="SqlSugarCoreNoDrive.Aot"/>
-    <PackageReference Include="SSH.NET"/>
-    <PackageReference Include="Xaml.Behaviors.Avalonia"/>
-    <PackageReference Include="Xaml.Behaviors.Interactions"/>
-    <PackageReference Include="Xaml.Behaviors.Interactions.DragAndDrop"/>
+    <PackageReference Include="R3Extensions.Avalonia" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="SqlSugarCoreNoDrive.Aot" />
+    <PackageReference Include="SSH.NET" />
+    <PackageReference Include="Xaml.Behaviors.Avalonia" />
+    <PackageReference Include="Xaml.Behaviors.Interactions" />
+    <PackageReference Include="Xaml.Behaviors.Interactions.DragAndDrop" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Options\" />
+    <Folder Include="ViewModels\Options\" />
   </ItemGroup>
 
   <ItemGroup>

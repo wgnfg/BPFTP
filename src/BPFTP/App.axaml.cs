@@ -29,7 +29,7 @@ public partial class App : Application
         ServiceProvider = ServicesCollection.BuildServiceProvider();
 
         var shellViewModel = ServiceProvider.GetRequiredService<ShellViewModel>();
-
+        ViewOperation.Init();
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
@@ -51,11 +51,10 @@ public partial class App : Application
     public static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<ShellViewModel>();
-        services.AddSingleton<SftpWorkspaceViewModel>();
 
         services.AddSingleton<DatabaseService>();
         services.AddSingleton<SftpService>();
-        services.AddSingleton<ViewService>();
+        services.AddSingleton<IViewService,ViewService>();
         services.AddSingleton<FileService>();
     }
 }

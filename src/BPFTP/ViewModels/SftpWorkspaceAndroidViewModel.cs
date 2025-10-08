@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BPFTP.ViewModels
 {
-    public partial class SftpWorkspaceViewModelForAndroid(DatabaseService databaseService, SftpService sftpService, ViewService viewService, FileService fileService, IPermissionService permissionService, ISecureCredentialService secureCredentialService) : SftpWorkspaceViewModel(databaseService, sftpService, viewService, fileService, permissionService, secureCredentialService)
+    public partial class SftpWorkspaceForAndroidViewModel(DatabaseService databaseService, SftpService sftpService, IViewService viewService, FileService fileService, IPermissionService permissionService, ISecureCredentialService secureCredentialService) : SftpWorkspaceViewModel(databaseService, sftpService, viewService, fileService, permissionService, secureCredentialService)
     {
     }
 }
