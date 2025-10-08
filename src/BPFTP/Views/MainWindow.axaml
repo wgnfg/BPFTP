@@ -6,7 +6,7 @@
         xmlns:views="clr-namespace:BPFTP.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="BPFTP.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/00013-1990500686.png"
         Title="BPFTP">
         <views:Shell />
 </Window>

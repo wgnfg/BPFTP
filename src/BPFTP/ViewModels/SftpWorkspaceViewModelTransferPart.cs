@@ -1,5 +1,6 @@
 ﻿using BPFTP.Services;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 using R3;
 using System;
 using System.Collections.Generic;
@@ -184,36 +185,41 @@ namespace BPFTP.ViewModels
 
         private async Task UploadFileAsync(FileItemViewModel item, Action<UploadProgress> onProgress, CancellationToken cancellationToken = default)
         {
+            var remotePath = Path.Combine(RemoteExplorer.CurPath, item.Name).Replace('\\', '/');
+            _logger.LogInformation("上传文件 {LocalPath} 到 {RemotePath}", item.Path, remotePath);
             try
             {
-                var remotePath = Path.Combine(RemoteExplorer.CurPath, item.Name).Replace('\\', '/');
                 await _sftpService.UploadFileObservable(item.Path, remotePath)
                     .ThrottleLast(TimeSpan.FromMilliseconds(200))
                     .ForEachAsync(onProgress, cancellationToken);
+                _logger.LogInformation("Successfully uploaded file {LocalPath} to {RemotePath}", item.Path, remotePath);
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Failed to upload file {LocalPath} to {RemotePath}", item.Path, remotePath);
             }
         }
 
         private async Task UploadDirectoryAsync(FileItemViewModel item, Action<DirectoryUploadProgress> onProgress,CancellationToken cancellationToken = default)
         {
+            var remotePath = Path.Combine(RemoteExplorer.CurPath, item.Name).Replace('\\', '/');
+            _logger.LogInformation("Uploading directory {LocalPath} to {RemotePath}", item.Path, remotePath);
             try
             {
-                var remotePath = Path.Combine(RemoteExplorer.CurPath, item.Name).Replace('\\', '/');
                 await _sftpService.UploadDirectoryObservable(item.Path, remotePath)
                     .ThrottleLast(TimeSpan.FromMilliseconds(200))
                     .ForEachAsync(onProgress, cancellationToken);
+                _logger.LogInformation("Successfully uploaded directory {LocalPath} to {RemotePath}", item.Path, remotePath);
             }
             catch (Exception e)
             {
-
+                _logger.LogError(e, "Failed to upload directory {LocalPath} to {RemotePath}", item.Path, remotePath);
             }
         }
 
         private async Task DownloadFileAsync(FileItemViewModel item, string localPath, Action<DownloadProgress> onProgress,CancellationToken cancellationToken = default)
         {
+            _logger.LogInformation("Downloading file {RemotePath} to {LocalPath}", item.Path, localPath);
             try
             {
                 await _sftpService.DownloadFileObservable(item.Path, localPath)
@@ -221,22 +227,26 @@ namespace BPFTP.ViewModels
                     .ForEachAsync(progress =>
                         onProgress(new DownloadProgress { Percentage = progress.TotalBytes > 0 ? (double)progress.BytesDownloaded / progress.TotalBytes * 100 : 0 }),
                         cancellationToken);
+                _logger.LogInformation("Successfully downloaded file {RemotePath} to {LocalPath}", item.Path, localPath);
             }
             catch (Exception ex) {
+                _logger.LogError(ex, "Failed to download file {RemotePath} to {LocalPath}", item.Path, localPath);
                 ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = $"下载失败:{ex.Message}" });
             }
         }
 
         private async Task DownloadDirectoryAsync(FileItemViewModel item, string localPath, Action<DownloadProgress> onProgress, CancellationToken cancellationToken = default)
         {
+            _logger.LogInformation("Downloading directory {RemotePath} to {LocalPath}", item.Path, localPath);
             try
             {
                 await _sftpService.DownloadDirectoryObservable(item.Path, localPath)
                     .ForEachAsync(progress => onProgress(new() { Name = progress.CurrentFile, Percentage = progress.Percentage }), cancellationToken);
+                _logger.LogInformation("Successfully downloaded directory {RemotePath} to {LocalPath}", item.Path, localPath);
             }
             catch (Exception ex)
             {
-
+                _logger.LogError(ex, "Failed to download directory {RemotePath} to {LocalPath}", item.Path, localPath);
             }
         }
 

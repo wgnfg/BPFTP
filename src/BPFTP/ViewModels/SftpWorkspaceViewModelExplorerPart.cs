@@ -68,7 +68,7 @@ namespace BPFTP.ViewModels
             LocalExplorer = new LocalExplorer()
             {
                 UpdateFoldersAndFiles = LoadLocalDirectoryAsync,
-                CurPath = Environment.CurrentDirectory
+                CurPath = OperatingSystem.IsWindows() ? "D://" : OperatingSystem.IsAndroid() ? "/storage/emulated/0" : Environment.CurrentDirectory
             };
             RemoteExplorer = new RemoteExplorer()
             {

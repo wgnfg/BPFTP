@@ -92,13 +92,17 @@
 		<DataTemplate DataType="{x:Type vm:RemoteExplorer}">
 			<DockPanel>
 				<Border DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
-					<StackPanel Orientation="Horizontal" Spacing="5">
-						<Button Content="上移" Command="{Binding GoUpCommand}"/>
-						<Button Content="刷" Command="{Binding RefreshCommand}"/>
-						<TextBox Text="{Binding CurPath, Mode=TwoWay}" Watermark="路径" MinWidth="200"/>
-						<TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="搜索" MinWidth="150"/>
-						<Button Content="批量下载" Command="{Binding $parent[UserControl].DataContext.DownloadManyCommand}"/>
-					</StackPanel>
+					<WrapPanel>
+						<StackPanel Orientation="Horizontal" Spacing="5">
+							<Button Content="上移" Command="{Binding GoUpCommand}"/>
+							<Button Content="刷" Command="{Binding RefreshCommand}"/>
+							<TextBox Text="{Binding CurPath, Mode=TwoWay}" Watermark="路径" MinWidth="200"/>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Spacing="5">
+							<TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="搜索" MinWidth="150"/>
+							<Button Content="批量下载" Command="{Binding $parent[UserControl].DataContext.DownloadManyCommand}"/>
+						</StackPanel>
+					</WrapPanel>
 				</Border>
 				<ScrollViewer>
 					<StackPanel>
@@ -113,13 +117,17 @@
 		<DataTemplate DataType="{x:Type vm:LocalExplorer}">
 			<DockPanel>
 				<Border DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
-					<StackPanel Orientation="Horizontal" Spacing="5">
-						<Button Content="上移" Command="{Binding GoUpCommand}"/>
-						<Button Content="刷" Command="{Binding RefreshCommand}"/>
-						<TextBox Text="{Binding CurPath, Mode=TwoWay}" Watermark="路径" MinWidth="200"/>
-						<TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="搜索" MinWidth="150"/>
-						<Button Content="批量上传" Command="{Binding $parent[UserControl].DataContext.UploadManyCommand}"/>
-					</StackPanel>
+					<WrapPanel>
+						<StackPanel Orientation="Horizontal" Spacing="5">
+							<Button Content="上移" Command="{Binding GoUpCommand}"/>
+							<Button Content="刷" Command="{Binding RefreshCommand}"/>
+							<TextBox Text="{Binding CurPath, Mode=TwoWay}" Watermark="路径" MinWidth="200"/>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Spacing="5">
+							<TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="搜索" MinWidth="150"/>
+							<Button Content="批量上传" Command="{Binding $parent[UserControl].DataContext.UploadManyCommand}"/>
+						</StackPanel>
+					</WrapPanel>
 				</Border>
 				<ScrollViewer>
 					<StackPanel>

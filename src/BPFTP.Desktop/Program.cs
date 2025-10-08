@@ -29,6 +29,7 @@ class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
+            .AfterPlatformServicesSetup(b => App.ServicesCollection.AddLogging())
             .UseR3();
     public static void ConfigureServices(IServiceCollection services)
     {

@@ -24,8 +24,8 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
     private readonly ISecureCredentialService _secureCredentialService = secureCredentialService;
     private SftpClient? _client;
 
-    public int WaitTimeForUpload = 1000;
-    public int WaitTimeForDownload = 1000;
+    public int WaitTimeForUpload = 0;
+    public int WaitTimeForDownload = 0;
     public bool IsConnected => _client?.IsConnected ?? false;
 
     private ConnectionProfile _profile;

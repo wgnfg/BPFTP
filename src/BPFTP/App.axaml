@@ -15,5 +15,6 @@
         <FontFamily x:Key="DefaultFontFamily">Microsoft YaHei</FontFamily>
 	    <FontFamily x:Key="ContentControlThemeFontFamily">Microsoft YaHei</FontFamily>
         <FontFamily x:Key="TextBlockThemeFontFamily">Microsoft YaHei</FontFamily>
+		<SolidColorBrush x:Key="ThemeBackgroundBrush">#99999999</SolidColorBrush>
     </Application.Resources>
 </Application>

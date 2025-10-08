@@ -2,10 +2,14 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
+using System.IO;
 using BPFTP.Services;
 using BPFTP.ViewModels;
 using BPFTP.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using System;
 
 namespace BPFTP;
@@ -24,7 +28,6 @@ public partial class App : Application
         // Line below is needed to remove Avalonia data validation.
         // Without this line you will get duplicate validations from both Avalonia and CT
         //BindingPlugins.DataValidators.RemoveAt(0);
-        
         ConfigureServices(ServicesCollection);
         ServiceProvider = ServicesCollection.BuildServiceProvider();
 
@@ -54,7 +57,37 @@ public partial class App : Application
 
         services.AddSingleton<DatabaseService>();
         services.AddSingleton<SftpService>();
-        services.AddSingleton<IViewService,ViewService>();
+        services.AddSingleton<IViewService, ViewService>();
         services.AddSingleton<FileService>();
     }
+
+}
+
+
+public static class AppLogging
+{
+    public static IServiceCollection AddLogging(this IServiceCollection services)
+    {
+        using var stream = AssetLoader.Open(new Uri("avares://BPFTP/serilog.json"));
+        var configuration = new ConfigurationBuilder()
+            .AddJsonStream(stream)
+            .Build();
+
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)
+            .CreateLogger();
+
+        AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+        {
+            Log.Fatal(e.ExceptionObject as Exception, "Unhandled exception");
+        };
+        
+        services.AddLogging(builder =>
+        {
+            builder.AddSerilog(dispose: true);
+        });
+
+        return services;
+    }
+
 }

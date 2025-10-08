@@ -24,6 +24,7 @@ public class MainActivity : AvaloniaMainActivity<App>
         AndroidPermissionService.MainActivity = this;
         return base.CustomizeAppBuilder(builder)
             .WithInterFont()
+            .AfterPlatformServicesSetup(b => App.ServicesCollection.AddLogging())
             .UseR3();
     }
 
@@ -32,7 +33,6 @@ public class MainActivity : AvaloniaMainActivity<App>
         services.AddSingleton<SftpWorkspaceViewModel, SftpWorkspaceForAndroidViewModel>();
         services.AddSingleton<IPermissionService, AndroidPermissionService>();
         services.AddSingleton<ISecureCredentialService, AndroidSecureCredentialService>();
-
     }
 
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)

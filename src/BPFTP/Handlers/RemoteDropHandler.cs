@@ -15,7 +15,7 @@ namespace BPFTP.Handlers
 
         public bool Validate(object? sender, DragEventArgs e, object? sourceContext, object? targetContext, object? state)
         {
-            if (e.Data.Get(DataFormats.Files) is IEnumerable<IStorageItem> files)
+            if (e.DataTransfer.Items is IEnumerable<IDataTransferItem>)
             {
                 return true;
             }
@@ -46,7 +46,7 @@ namespace BPFTP.Handlers
                 return true;
             }
 
-            if (e.Data.Get(DataFormats.Files) is IEnumerable<IStorageItem> files)
+            if (e.DataTransfer.Items is IEnumerable<IStorageItem> files)
             {
                 foreach (var file in files)
                 {
