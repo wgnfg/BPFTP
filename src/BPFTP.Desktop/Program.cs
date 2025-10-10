@@ -31,11 +31,11 @@ class Program
             .LogToTrace()
             .AfterPlatformServicesSetup(b => App.ServicesCollection.AddLogging())
             .UseR3();
-    public static void ConfigureServices(IServiceCollection services)
-    {
-        services.AddSingleton<SftpWorkspaceViewModel, SftpWorkspaceViewModel>();
-        services.AddSingleton<IPermissionService, DesktopPermissionService>();
-        services.AddSingleton<ISecureCredentialService, DesktopSecureCredentialService>();
-    }
+        public static void ConfigureServices(IServiceCollection services)
+        {
+            services.AddSingleton<SftpWorkspaceViewModel, SftpWorkspaceViewModel>();
+            services.AddSingleton<IPermissionService, DesktopPermissionService>();
+            services.AddSingleton<ISecureCredentialService, DesktopSecureCredentialService>();
+        }
 
 }

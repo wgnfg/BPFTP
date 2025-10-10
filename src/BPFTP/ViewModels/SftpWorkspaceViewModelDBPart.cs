@@ -22,6 +22,7 @@ namespace BPFTP.ViewModels
         [NotifyCanExecuteChangedFor(nameof(ConnectCommand))]
         [NotifyCanExecuteChangedFor(nameof(EditConnectionCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCommand))]
+        [NotifyCanExecuteChangedFor(nameof(SshCommand))]
         private ConnectionProfile? _selectedConnection;
 
 
@@ -57,15 +58,28 @@ namespace BPFTP.ViewModels
 
         private async Task SaveOrUpdateConnection(ConnectionProfile profile)
         {
+            // Store credentials in local variables to be used after the profile is saved.
+            var password = profile.Password;
+            var privateKeyPassword = profile.PrivateKeyPassword;
 
-            // Store credentials securely first.
-            await StoreCredentialsAsync(profile);
-
-            // Clear credentials from the profile object before saving to the database.
             profile.Password = string.Empty;
             profile.PrivateKeyPassword = string.Empty;
 
             await _databaseService.SaveConnectionAsync(profile);
+
+            if (profile.Id > 0)
+            {
+                if (!string.IsNullOrEmpty(password))
+                {
+                    await _secureCredentialService.StoreCredentialAsync($"profile-{profile.Id}-password", password);
+                }
+
+                if (!string.IsNullOrEmpty(privateKeyPassword))
+                {
+                    await _secureCredentialService.StoreCredentialAsync($"profile-{profile.Id}-keypassword", privateKeyPassword);
+                }
+            }
+
             await InitConnectionItemsAsync();
         }
 
@@ -84,25 +98,5 @@ namespace BPFTP.ViewModels
                 await InitConnectionItemsAsync();
             }
         }
-
-        private async Task StoreCredentialsAsync(ConnectionProfile profile)
-        {
-            // The profile must have an ID to create a unique key.
-            // If it's a new profile, SaveConnectionAsync should assign one.
-            if (profile.Id == 0)
-            {
-                await _databaseService.SaveConnectionAsync(profile);
-            }
-
-            if (!string.IsNullOrEmpty(profile.Password))
-            {
-                await _secureCredentialService.StoreCredentialAsync($"profile-{profile.Id}-password", profile.Password);
-            }
-
-            if (!string.IsNullOrEmpty(profile.PrivateKeyPassword))
-            {
-                await _secureCredentialService.StoreCredentialAsync($"profile-{profile.Id}-keypassword", profile.PrivateKeyPassword);
-            }
-        }   
     }
 }

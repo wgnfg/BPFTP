@@ -4,6 +4,8 @@ using BPFTP.Services;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace BPFTP.ViewModels
@@ -53,5 +55,32 @@ namespace BPFTP.ViewModels
             }
         }
 
+        public bool IsSshSupported { get => RuntimeInformation.IsOSPlatform(OSPlatform.Windows); }
+
+        [RelayCommand(CanExecute = nameof(ConnectionSelected))]
+        private void Ssh()
+        {
+            if (SelectedConnection == null) return;
+
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = "cmd",
+                Arguments = SelectedConnection.AuthMethod == Models.AuthroizeMethod.Password?
+                    $"/K ssh {SelectedConnection.Username}@{SelectedConnection.Host} -p {SelectedConnection.Port}":
+                    $"/K ssh -i {SelectedConnection.PrivateKeyPath} {SelectedConnection.Username}@{SelectedConnection.Host} -p {SelectedConnection.Port}",
+                UseShellExecute = false,
+                CreateNoWindow = false,
+            };
+
+            try
+            {
+                var process = Process.Start(processStartInfo);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to start SSH process for {Host}", SelectedConnection.Host);
+                ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = $"启动 SSH 失败: {ex.Message}" });
+            }
+        }
     }
 }
