@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BPFTP.ViewModels
 {
-    public readonly record struct DownloadProgress(string Name, double Percentage);
+    public readonly record struct DownloadProgress(string Name, double Percentage, double Speed);
     public partial class TransferProgressViewModel : PopupViewModelBase
     {
         [ObservableProperty]
@@ -28,6 +28,9 @@ namespace BPFTP.ViewModels
         private int _totalFileCount = 0;
         [ObservableProperty]
         private double _percentage;
+
+        [ObservableProperty]
+        private double _speed = 0;
 
         [ObservableProperty]
         private string _errorMessage = string.Empty;

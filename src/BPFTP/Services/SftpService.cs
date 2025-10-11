@@ -1,11 +1,14 @@
 ﻿using BPFTP.Models;
 using BPFTP.Utils;
+using Newtonsoft.Json.Linq;
 using R3;
 using Renci.SshNet;
 using Renci.SshNet.Sftp;
+using Serilog;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
@@ -14,10 +17,8 @@ using System.Threading.Tasks;
 
 namespace BPFTP.Services;
 
-public readonly record struct DownloadProgress(long BytesDownloaded, long TotalBytes);
-public readonly record struct UploadProgress(long BytesUploaded, long TotalBytes);
-public readonly record struct DirectoryDownloadProgress(string CurrentFile, double Percentage);
-public readonly record struct DirectoryUploadProgress(string CurrentFile, double Percentage);
+public readonly record struct TransferProgress(ulong BytesTransfered, double Percentage, double Speed);
+public readonly record struct DirectoryTransferProgress(string CurrentFile, double Percentage, double Speed);
 
 public class SftpService(ISecureCredentialService secureCredentialService) : IDisposable
 {
@@ -63,44 +64,32 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
     public IAsyncEnumerable<ISftpFile>? ListDirectoryAsync(string path,CancellationToken cancellationToken = default) => 
         _client?.ListDirectoryAsync(path, cancellationToken);
 
-    public Observable<DownloadProgress> DownloadFileObservable(string remotePath, string localPath)
+    public async Task<(Observable<TransferProgress> progressObservable, string fileName, ulong totalBytes)>
+        DownloadFileObservable(string remotePath, string localPath)
     {
-        return Observable.Create<DownloadProgress>(async (observer, cancellationToken) =>
+
+        var thisClient = await ConnectAsync(_profile);
+        var fileInfo = await Task.Run(() => thisClient.Value.Get(remotePath));
+        var localFileInfo = new FileInfo(localPath);
+        long totalSize = fileInfo.Length;
+        double percentMultiply = 1/(double)totalSize;
+        var fileName = fileInfo.Name;
+        var uploadObservable = Observable.Create<ulong>(async (observer, cancellationToken) =>
         {
-            if (!IsConnected || _client == null || _profile == null)
+            if (!IsConnected || _client == null)
             {
                 observer.OnErrorResume(new InvalidOperationException("Not connected"));
                 return;
             }
-            using var thisClient = await ConnectAsync(_profile, cancellationToken);
-            byte[]? buffer = null;
             try
             {
-                var fileInfo = await Task.Run(() => thisClient.Value.Get(remotePath), cancellationToken);
+                await using var localStream = localFileInfo.OpenWrite();
+
+
                 long totalSize = fileInfo.Length;
-                long totalDownloaded = 0;
 
-                buffer = ArrayPool<byte>.Shared.Rent(81920);
-                var memory = buffer.AsMemory();
-
-                await using var remoteStream = thisClient.Value.OpenRead(remotePath);
-                await using var localStream = new FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true);
-
-                int bytesRead;
-                while ((bytesRead = await remoteStream.ReadAsync(memory, cancellationToken)) > 0)
-                {
-                    await localStream.WriteAsync(memory[..bytesRead], cancellationToken);
-                    totalDownloaded += bytesRead;
-                    observer.OnNext(new DownloadProgress(totalDownloaded, totalSize));
-                    await Task.Delay(WaitTimeForDownload, cancellationToken);
-                }
-
-                await localStream.FlushAsync(cancellationToken);
-                await localStream.DisposeAsync();
-                observer.OnCompleted();
-            }
-            catch (OperationCanceledException)
-            {
+                thisClient.Value.DownloadFile(remotePath,localStream ,
+                    x => observer.OnNext(x));
                 observer.OnCompleted();
             }
             catch (Exception ex)
@@ -109,26 +98,42 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
             }
             finally
             {
-                if (buffer != null)
-                {
-                    ArrayPool<byte>.Shared.Return(buffer);
-                }
+                thisClient.Dispose();
             }
         });
+        return (uploadObservable
+            .ThrottleLast(TimeSpan.FromMilliseconds(200))
+            .Timestamp()
+            .Chunk(2, 1)
+            .Where(buf => buf.Length >= 2)
+            .Select(buf =>
+            {
+                var (Timestamp, Value) = buf[0];
+                var curr = buf[^1];
+                var bytesDiff = (curr.Value - Value) / (1024 * 1024d);
+                var secondsDiff = (curr.Timestamp - Timestamp) / (double)Stopwatch.Frequency;
+                var speedBps = secondsDiff > 0 ? bytesDiff / secondsDiff : 0;
+                return new TransferProgress()
+                {
+                    Percentage = curr.Value * percentMultiply,
+                    BytesTransfered = curr.Value,
+                    Speed = speedBps
+                };
+            }), fileName, (ulong)totalSize);
     }
 
-    public Observable<DirectoryDownloadProgress> DownloadDirectoryObservable(string remotePath, string localPath)
+    public Observable<DirectoryTransferProgress> DownloadDirectoryObservable(string remotePath, string localPath)
     {
-        return Observable.Create<DirectoryDownloadProgress>(async (observer, cancellationToken) =>
+        return Observable.Create<DirectoryTransferProgress>(async (observer, cancellationToken) =>
         {
-            using var thisClient = await ConnectAsync(_profile);
+            using var thisClient = await ConnectAsync(_profile, cancellationToken);
             if (!IsConnected || _client == null)
             {
                 observer.OnErrorResume(new InvalidOperationException("Not connected"));
             }
             try
             {
-                await DownloadDirectoryRecursiveAsync(remotePath, localPath, observer, thisClient.Value);
+                await DownloadDirectoryRecursiveAsync(remotePath, localPath, observer, thisClient.Value, cancellationToken);
                 observer.OnCompleted();
             }
             catch (OperationCanceledException)
@@ -142,7 +147,7 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
         });
     }
 
-    private async Task DownloadDirectoryRecursiveAsync(string remoteDirPath, string localDirPath, Observer<DirectoryDownloadProgress> observer,SftpClient sftpClient)
+    private async Task DownloadDirectoryRecursiveAsync(string remoteDirPath, string localDirPath, Observer<DirectoryTransferProgress> observer,SftpClient sftpClient,CancellationToken token = default)
     {
         if (sftpClient == null) return;
         Directory.CreateDirectory(localDirPath);
@@ -155,55 +160,45 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
             string remoteItemPath = item.FullName;
             string localItemPath = Path.Combine(localDirPath, item.Name);
 
+
             if (item.IsDirectory)
             {
                 await DownloadDirectoryRecursiveAsync(remoteItemPath, localItemPath, observer, sftpClient);
             }
             else
             {
-                await foreach (var progress in DownloadFileObservable(remoteItemPath, localItemPath).ToAsyncEnumerable())
+
+                var (progressObservable, fileName, totalBytes) = await DownloadFileObservable(remoteItemPath, localItemPath);
+                progressObservable.Subscribe(progress =>
                 {
-                    double percentage = progress.TotalBytes > 0 ? (double)progress.BytesDownloaded / progress.TotalBytes * 100 : 0;
-                    observer.OnNext(new DirectoryDownloadProgress(item.Name, percentage));
-                }
+                    double percentage = totalBytes > 0 ? (double)progress.BytesTransfered / totalBytes * 100 : 0;
+                    observer.OnNext(new DirectoryTransferProgress(item.Name, percentage, progress.Speed));
+                });
+                await progressObservable.WaitAsync(token);
             }
         }
     }
 
-    public Observable<UploadProgress> UploadFileObservable(string localPath, string remotePath)
+    public async Task<(Observable<TransferProgress> progressObservable,string fileName,ulong totalBytes)>
+        UploadFileObservable(string localPath, string remotePath)
     {
-        return Observable.Create<UploadProgress>(async (observer, cancellationToken) =>
+        var thisClient = await ConnectAsync(_profile);
+        var fileInfo = new FileInfo(localPath);
+        long totalSize = fileInfo.Length;
+        var fileName = fileInfo.Name;
+        double percentMultiply = 100 / (double)totalSize;
+        var uploadObservable = Observable.Create<ulong>(async (observer, cancellationToken) =>
         {
             if (!IsConnected || _client == null)
             {
                 observer.OnErrorResume(new InvalidOperationException("Not connected"));
                 return;
             }
-            using var thisClient = await ConnectAsync(_profile, cancellationToken);
-            byte[]? buffer = null;
             try
             {
-                var fileInfo = new FileInfo(localPath);
-                long totalSize = fileInfo.Length;
-
                 await using var localStream = fileInfo.OpenRead();
-                await using var remoteStream = thisClient.Value.OpenWrite(remotePath);
-
-                long totalUploaded = 0;
-                buffer = ArrayPool<byte>.Shared.Rent(81920);
-                var memory = buffer.AsMemory();
-                int bytesRead;
-
-                while ((bytesRead = await localStream.ReadAsync(memory, cancellationToken)) > 0)
-                {
-                    await remoteStream.WriteAsync(memory[..bytesRead], cancellationToken);
-                    totalUploaded += bytesRead;
-                    observer.OnNext(new UploadProgress(totalUploaded, totalSize));
-                    await Task.Delay(WaitTimeForUpload, cancellationToken);
-                }
-
-                await remoteStream.FlushAsync(cancellationToken);
-                await remoteStream.DisposeAsync();
+                thisClient.Value.UploadFile(localStream, remotePath, 
+                    x=>observer.OnNext(x));
                 observer.OnCompleted();
             }
             catch (Exception ex)
@@ -212,17 +207,33 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
             }
             finally
             {
-                if (buffer != null)
-                {
-                    ArrayPool<byte>.Shared.Return(buffer);
-                }
+                thisClient.Dispose();
             }
         });
+        return (uploadObservable
+            .ThrottleLast(TimeSpan.FromMilliseconds(200))
+            .Timestamp()
+            .Chunk(2, 1)
+            .Where(buf => buf.Length >= 2)
+            .Select(buf =>
+            {
+                var (Timestamp, Value) = buf[0];
+                var curr = buf[^1];
+                var bytesDiff = (curr.Value - Value) / (1024 * 1024d);
+                var secondsDiff = (curr.Timestamp - Timestamp) / (double)Stopwatch.Frequency;
+                var speedBps = secondsDiff > 0 ? bytesDiff / secondsDiff : 0;
+                return new TransferProgress()
+                {
+                    Percentage = curr.Value * percentMultiply,
+                    BytesTransfered = curr.Value,
+                    Speed = speedBps
+                };
+            }), fileName, (ulong)totalSize);
     }
 
-    public Observable<DirectoryUploadProgress> UploadDirectoryObservable(string localPath, string remotePath)
+    public Observable<DirectoryTransferProgress> UploadDirectoryObservable(string localPath, string remotePath)
     {
-        return Observable.Create<DirectoryUploadProgress>(async (observer, ct) =>
+        return Observable.Create<DirectoryTransferProgress>(async (observer, ct) =>
         {
             if (!IsConnected || _client == null)
             {
@@ -232,7 +243,7 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
             using var thisClient = await ConnectAsync(_profile, ct);
             try
             {
-                await UploadDirectoryRecursiveAsync(localPath, remotePath, observer, thisClient.Value).ConfigureAwait(false);
+                await UploadDirectoryRecursiveAsync(localPath, remotePath, observer, thisClient.Value, ct);
                 observer.OnCompleted();
             }
             catch (Exception ex)
@@ -242,21 +253,20 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
         });
     }
 
-    private async Task UploadDirectoryRecursiveAsync(string localDirPath, string remoteDirPath, Observer<DirectoryUploadProgress> observer,SftpClient sftpClient)
+    private async Task UploadDirectoryRecursiveAsync(string localDirPath, string remoteDirPath, Observer<DirectoryTransferProgress> observer,SftpClient sftpClient,CancellationToken token = default)
     {
         if (_client == null) return;
-        using var thisClient = await ConnectAsync(_profile);
         // Create the remote directory if it doesn't exist
         try
         {
-            if (!thisClient.Value.Exists(remoteDirPath))
+            if (!sftpClient.Exists(remoteDirPath))
             {
-                thisClient.Value.CreateDirectory(remoteDirPath);
+                sftpClient.CreateDirectory(remoteDirPath);
             }
         }
         catch (Exception ex)
         {
-            thisClient.Value.CreateDirectory(remoteDirPath);
+            sftpClient.CreateDirectory(remoteDirPath);
         }
 
         var localDirInfo = new DirectoryInfo(localDirPath);
@@ -265,18 +275,20 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
         foreach (var dir in localDirInfo.GetDirectories())
         {
             string remoteSubDirPath = remoteDirPath + "/" + dir.Name;
-            await UploadDirectoryRecursiveAsync(dir.FullName, remoteSubDirPath, observer, thisClient.Value);
+            await UploadDirectoryRecursiveAsync(dir.FullName, remoteSubDirPath, observer, sftpClient, token);
         }
 
         // Upload files in the current directory
         foreach (var file in localDirInfo.GetFiles())
         {
             string remoteFilePath = remoteDirPath + "/" + file.Name;
-            await foreach (var progress in UploadFileObservable(file.FullName, remoteFilePath).ToAsyncEnumerable())
+            var (progressObservable, fileName, totalBytes) = await UploadFileObservable(file.FullName, remoteFilePath);
+            progressObservable.Subscribe(progress =>
             {
-                double percentage = progress.TotalBytes > 0 ? (double)progress.BytesUploaded / progress.TotalBytes * 100 : 0;
-                observer.OnNext(new DirectoryUploadProgress(file.Name, percentage));
-            }
+                double percentage = totalBytes > 0 ? (double)progress.BytesTransfered / totalBytes * 100 : 0;
+                observer.OnNext(new DirectoryTransferProgress(file.Name, percentage, progress.Speed));
+            });
+            await progressObservable.WaitAsync(token);
         }
     }
 
