@@ -14,6 +14,7 @@ namespace BPFTP.ViewModels
     {
         public List<FileItemViewModel> AllFolders = [];
         public List<FileItemViewModel> AllFiles = [];
+        [ObservableProperty] private bool _isSelectMode = false;
         [ObservableProperty] private string _curPath = string.Empty;
         [ObservableProperty] private string _searchText = string.Empty;
         [ObservableProperty] private List<FileItemViewModel> _filteredFolders = [];

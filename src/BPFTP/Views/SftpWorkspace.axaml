@@ -12,7 +12,7 @@
 		<DataTemplate DataType="{x:Type vm:RemoteFolder}">
 			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
 				<StackPanel Spacing="5">
-					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}"/>
+					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}" IsVisible="{Binding $parent[UserControl].DataContext.RemoteExplorer.IsSelectMode}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
 				<Border.ContextMenu>
@@ -34,7 +34,7 @@
 		<DataTemplate DataType="{x:Type vm:RemoteFile}">
 			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
 				<StackPanel Spacing="5">
-					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}"/>
+					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}" IsVisible="{Binding $parent[UserControl].DataContext.RemoteExplorer.IsSelectMode}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
 				<Border.ContextMenu>
@@ -52,7 +52,7 @@
 		<DataTemplate DataType="{x:Type vm:LocalFolder}">
 			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
 				<StackPanel Spacing="5">
-					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}"/>
+					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}" IsVisible="{Binding $parent[UserControl].DataContext.LocalExplorer.IsSelectMode}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
 				<Border.ContextMenu>
@@ -74,7 +74,7 @@
 		<DataTemplate DataType="{x:Type vm:LocalFile}">
 			<Border BorderBrush="Gray" BorderThickness="1" CornerRadius="3" Padding="5" Margin="3" MinWidth="120">
 				<StackPanel Spacing="5">
-					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}"/>
+					<CheckBox IsChecked="{Binding IsSelected,UpdateSourceTrigger=PropertyChanged}" IsVisible="{Binding $parent[UserControl].DataContext.LocalExplorer.IsSelectMode}"/>
 					<TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
 				</StackPanel>
 				<Border.ContextMenu>
@@ -93,14 +93,15 @@
 			<DockPanel>
 				<Border DockPanel.Dock="Top" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
 					<WrapPanel>
-						<StackPanel Orientation="Horizontal" Spacing="5">
+						<StackPanel Orientation="Horizontal" Spacing="5"  Margin="0,0,5,0">
 							<Button Content="上移" Command="{Binding GoUpCommand}"/>
 							<Button Content="刷" Command="{Binding RefreshCommand}"/>
 							<TextBox Text="{Binding CurPath, Mode=TwoWay}" Watermark="路径" MinWidth="200"/>
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" Spacing="5">
 							<TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="搜索" MinWidth="150"/>
-							<Button Content="批量下载" Command="{Binding $parent[UserControl].DataContext.DownloadManyCommand}"/>
+							<CheckBox  IsChecked="{Binding $parent[UserControl].DataContext.RemoteExplorer.IsSelectMode}">选</CheckBox>
+							<Button Content="批量下载" Command="{Binding $parent[UserControl].DataContext.DownloadManyCommand}" IsVisible="{Binding $parent[UserControl].DataContext.RemoteExplorer.IsSelectMode}"/>
 						</StackPanel>
 					</WrapPanel>
 				</Border>
@@ -125,7 +126,8 @@
 						</StackPanel>
 						<StackPanel Orientation="Horizontal" Spacing="5">
 							<TextBox Text="{Binding SearchText, Mode=TwoWay}" Watermark="搜索" MinWidth="150"/>
-							<Button Content="批量上传" Command="{Binding $parent[UserControl].DataContext.UploadManyCommand}"/>
+							<CheckBox  IsChecked="{Binding $parent[UserControl].DataContext.LocalExplorer.IsSelectMode}">选</CheckBox>
+							<Button Content="批量上传" Command="{Binding $parent[UserControl].DataContext.UploadManyCommand}" IsVisible="{Binding $parent[UserControl].DataContext.LocalExplorer.IsSelectMode}"/>
 						</StackPanel>
 					</WrapPanel>
 				</Border>
@@ -154,7 +156,7 @@
 	<Grid RowDefinitions="Auto, *, Auto, *, Auto">
 		<Border Grid.Row="0" BorderBrush="Gray" BorderThickness="0 0 0 1" Padding="5">
 			<DockPanel>
-				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="5">
+				<StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="5" Margin="0,0,5,0">
 					<Button Content="删" Command="{Binding DeleteConnectionCommand}"/>
 					<Button Content="改" Command="{Binding EditConnectionCommand}"/>
 				</StackPanel>
@@ -185,7 +187,7 @@
 		<DockPanel Grid.Row="3" DataContext="{Binding LocalExplorer}">
 			<ContentControl DockPanel.Dock="Top" Content="{Binding}" />
 			<Interaction.Behaviors>
-				<drag:ContextDropBehavior Handler="{Binding $parent[UserControl].DataContext.RemoteDropHandler}"/>
+				<drag:ContextDropBehavior Handler="{Binding $parent[UserControl].DataContext.LocalDropHandler}"/>
 			</Interaction.Behaviors>
 		</DockPanel>
 

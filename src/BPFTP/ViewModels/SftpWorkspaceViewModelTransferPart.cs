@@ -20,30 +20,42 @@ namespace BPFTP.ViewModels
         {
             _ = Task.Run(async () =>
             {
-                if (item == null || !_sftpService.IsConnected) return;
+                if (item == null || !_sftpService.IsConnected) {
+                    ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = "没连" });    
+                    return; 
+                }
                 var progressVm = new TransferProgressViewModel { Title = $"上传: {item.Name}" };
                 using (var scope = ViewOperation.PopupScope(progressVm))
                 {
-                    if (item.IsDirectory)
+                    try
                     {
-                        await UploadDirectoryAsync(item, progress =>
+                        if (item.IsDirectory)
                         {
-                            progressVm.CurrentFileName = progress.CurrentFile;
-                            progressVm.Percentage = progress.Percentage;
-                            progressVm.Speed = progress.Speed;
-                        }, progressVm.CancellationToken);
-                    }
-                    else
-                    {
-                        progressVm.CurrentFileName = item.Name;
-                        await UploadFileAsync(item,
-                            progress =>
-                            { 
+                            await UploadDirectoryAsync(item, progress =>
+                            {
+                                progressVm.CurrentFileName = progress.CurrentFile;
                                 progressVm.Percentage = progress.Percentage;
                                 progressVm.Speed = progress.Speed;
-                            },
-                            x => { progressVm.CurrentFileName = x.fileName; },
-                            progressVm.CancellationToken);
+                            }, progressVm.CancellationToken);
+                        }
+                        else
+                        {
+                            progressVm.CurrentFileName = item.Name;
+                            await UploadFileAsync(item,
+                                progress =>
+                                {
+                                    progressVm.Percentage = progress.Percentage;
+                                    progressVm.Speed = progress.Speed;
+                                },
+                                x => { progressVm.CurrentFileName = x.fileName; },
+                                progressVm.CancellationToken);
+                        }
+                        progressVm.ErrorMessage = "已完成";
+                    }
+                    catch(Exception e)
+                    {
+                        progressVm.ErrorMessage = e.Message;
+                        await Task.Delay(5000);
                     }
                 }
                 await RemoteExplorer.Refresh();
@@ -53,31 +65,46 @@ namespace BPFTP.ViewModels
         [RelayCommand]
         public void DownloadItem(FileItemViewModel? item)
         {
-            if (item == null || !_sftpService.IsConnected) return;
-
+            if (item == null || !_sftpService.IsConnected)
+            {
+                ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = "没连" });
+                return;
+            }
             _ = Task.Run(async () =>
             {
                 var localPath = Path.Combine(LocalExplorer.CurPath, item.Name);
                 var progressVm = new TransferProgressViewModel { Title = $"下载: {item.Name}" };
-                using var scope = ViewOperation.PopupScope(progressVm);
-                if (item.IsDirectory)
+                using (var scope = ViewOperation.PopupScope(progressVm))
                 {
-                    await DownloadDirectoryAsync(item, localPath, progress =>
+                    try
                     {
-                        progressVm.CurrentFileName = progress.Name;
-                        progressVm.Percentage = progress.Percentage;
-                        progressVm.Speed = progress.Speed;
-                    }, progressVm.CancellationToken);
+                        if (item.IsDirectory)
+                        {
+                            await DownloadDirectoryAsync(item, localPath, progress =>
+                            {
+                                progressVm.CurrentFileName = progress.Name;
+                                progressVm.Percentage = progress.Percentage;
+                                progressVm.Speed = progress.Speed;
+                            },
+                            progressVm.CancellationToken);
+                        }
+                        else
+                        {
+                            progressVm.CurrentFileName = item.Name;
+                            await DownloadFileAsync(item, localPath, progress =>
+                            {
+                                progressVm.Percentage = progress.Percentage;
+                                progressVm.Speed = progress.Speed;
+                            }, x => { progressVm.FileName = x.fileName; }, progressVm.CancellationToken);
+                        }
+                        progressVm.ErrorMessage = "已完成";
+                    }
+                    catch (Exception e)
+                    {
+                        progressVm.ErrorMessage = e.Message;
+                        await Task.Delay(5000);
+                    }
                 }
-                else
-                {
-                    progressVm.CurrentFileName = item.Name;
-                    await DownloadFileAsync(item, localPath, progress => {
-                        progressVm.Percentage = progress.Percentage;
-                        progressVm.Speed = progress.Speed;
-                    },x=> { }, progressVm.CancellationToken);
-                }
-
                 await LocalExplorer.Refresh();
             });
         }
@@ -90,10 +117,14 @@ namespace BPFTP.ViewModels
                 List<FileItemViewModel> selectedItems = [.. LocalExplorer.AllFolders.Where(i => i.IsSelected)
                 ,..LocalExplorer.AllFiles.Where(i => i.IsSelected)];
 
-                if (selectedItems.Count == 0 || !_sftpService.IsConnected) return;
+                if (!_sftpService.IsConnected)
+                {
+                    ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = "没连" });
+                    return;
+                }
 
                 var progressVm = new TransferProgressViewModel { Title = "批量上传" };
-                using var scope = ViewOperation.PopupScope(progressVm);
+                using var scope = ViewOperation.PopupScope(progressVm) ;
                 try
                 {
                     var totalItems = selectedItems.Count;
@@ -126,6 +157,7 @@ namespace BPFTP.ViewModels
                             progressVm.CancellationToken);
                         }
                     }
+                    progressVm.ErrorMessage = "已完成";
                 }
                 catch (Exception ex)
                 {
@@ -147,7 +179,11 @@ namespace BPFTP.ViewModels
                 List<FileItemViewModel> selectedItems = [..RemoteExplorer.AllFolders.Where(i => i.IsSelected)
                 ,..RemoteExplorer.AllFiles.Where(i => i.IsSelected)];
 
-                if (!selectedItems.Any() || !_sftpService.IsConnected) return;
+                if (!_sftpService.IsConnected)
+                {
+                    ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = "没连" });
+                    return;
+                }
 
                 var progressVm = new TransferProgressViewModel { Title = "Batch Downloading..." };
                 using var _ = ViewOperation.PopupScope(progressVm);
@@ -180,10 +216,12 @@ namespace BPFTP.ViewModels
                             progressVm.CurrentFileName = item.Name;
                             await DownloadFileAsync(item, localPath, progress =>
                             {
+                                progressVm.Speed = progress.Speed;
                                 progressVm.Percentage =progress.Percentage;
                             });
                         }
                     }
+                    progressVm.ErrorMessage = "已完成";
                 }
                 catch (Exception ex)
                 {
@@ -210,8 +248,8 @@ namespace BPFTP.ViewModels
             {
                 Stopwatch stopwatch = new();
                 stopwatch.Start();
-                var (progressObservable, fileName, totalBytes) = 
-                   await  _sftpService.UploadFileObservable(item.Path, remotePath);
+                var (progressObservable, fileName, totalBytes) =
+                   await _sftpService.UploadFileObservable(item.Path, remotePath, cancellationToken);
                 setCommonMessage((fileName, totalBytes));
                 await progressObservable
                     .ForEachAsync(onProgress, cancellationToken);
@@ -231,13 +269,14 @@ namespace BPFTP.ViewModels
             try
             { 
                 await _sftpService.UploadDirectoryObservable(item.Path, remotePath)
-                    .ThrottleLast(TimeSpan.FromMilliseconds(200))
+                    .ThrottleLast(TimeSpan.FromMilliseconds(50))
                     .ForEachAsync(onProgress, cancellationToken);
                 _logger.LogInformation("Successfully uploaded directory {LocalPath} to {RemotePath}", item.Path, remotePath);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to upload directory {LocalPath} to {RemotePath}", item.Path, remotePath);
+                throw;
             }
         }
 
@@ -252,16 +291,17 @@ namespace BPFTP.ViewModels
                 Stopwatch stopwatch = new();
                 stopwatch.Start();
                 var (progressObservable, fileName, totalBytes) =
-                   await _sftpService.DownloadFileObservable(item.Path, localPath);
-                setCommonMessage((fileName, totalBytes));
+                   await _sftpService.DownloadFileObservable(item.Path, localPath, cancellationToken);
+                setCommonMessage?.Invoke((fileName, totalBytes));
                 await progressObservable
-                    .ForEachAsync(onProgress, cancellationToken);
+                    .ForEachAsync(onProgress ,cancellationToken);
+                
                 stopwatch.Stop();
-                _logger.LogInformation("Successfully downloaded file {LocalPath} to {RemotePath},time:{time},speed:{speed}", item.Path, localPath, stopwatch.ElapsedMilliseconds / 1000d, (long)totalBytes / stopwatch.ElapsedMilliseconds);
+                _logger.LogInformation("Successfully downloaded file {RemotePath} to {LocalPath},time:{time},speed:{speed}", item.Path, localPath, stopwatch.ElapsedMilliseconds / 1000d, (long)totalBytes / stopwatch.ElapsedMilliseconds);
             }
             catch (Exception ex) {
-                _logger.LogError(ex, "Failed to download file {RemotePath} to {LocalPath}", item.Path, localPath);
-                ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = $"下载失败:{ex.Message}" });
+                _logger.LogError(ex, "Failed to download directory {RemotePath} to {LocalPath}", item.Path, localPath);
+                throw;
             }
         }
 
@@ -271,12 +311,14 @@ namespace BPFTP.ViewModels
             try
             {
                 await _sftpService.DownloadDirectoryObservable(item.Path, localPath)
-                    .ForEachAsync(progress => onProgress(new() { Name = progress.CurrentFile, Percentage = progress.Percentage,Speed = progress.Speed }), cancellationToken);
+                    .ForEachAsync(progress => 
+                    onProgress(new() { Name = progress.CurrentFile, Percentage = progress.Percentage,Speed = progress.Speed }), cancellationToken);
                 _logger.LogInformation("Successfully downloaded directory {RemotePath} to {LocalPath}", item.Path, localPath);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to download directory {RemotePath} to {LocalPath}", item.Path, localPath);
+                throw;
             }
         }
 

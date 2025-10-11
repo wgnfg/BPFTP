@@ -51,9 +51,8 @@ namespace BPFTP.Services
 
         public async Task<int> SaveSettingAsync(SettingKey key, string value)
         {
-            var setting = (await _db.Queryable<ApplicationSetting>().Where(X => X.Key == key).FirstAsync()) ?? new();
-            setting.Value = value;
-            return await _db.Storageable(setting).WhereColumns(it => it.Key).ExecuteCommandAsync();
+            var setting = (await _db.Queryable<ApplicationSetting>().Where(X => X.Key == key).FirstAsync()) ?? new() { Key = key, Value = value };
+            return await _db.Storageable(setting).ExecuteCommandAsync();
         }
 
     }

@@ -45,8 +45,7 @@ namespace BPFTP.Handlers
                 }
                 return true;
             }
-
-            if (e.DataTransfer.Items is IEnumerable<IStorageItem> files)
+            if (e.DataTransfer.TryGetFiles() is IEnumerable<IStorageItem> files)
             {
                 foreach (var file in files)
                 {

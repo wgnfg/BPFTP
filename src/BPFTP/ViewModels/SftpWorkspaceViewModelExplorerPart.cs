@@ -43,7 +43,11 @@ namespace BPFTP.ViewModels
                 RemoteExplorer.AllFiles = newFiles;
                 RemoteExplorer.FilterView();
             }
-            catch (Exception ex) {  }
+            catch (Exception ex) {
+                RemoteExplorer.AllFolders = [];
+                RemoteExplorer.AllFiles = [];
+                RemoteExplorer.FilterView();
+            }
         }
         private async Task LoadLocalDirectoryAsync(string path)
         {

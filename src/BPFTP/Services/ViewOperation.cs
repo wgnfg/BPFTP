@@ -44,7 +44,7 @@ namespace BPFTP.Services
             _viewService?.HidePopup(viewModel);
         }
 
-        public static IDisposable PopupScope(PopupViewModelBase viewModel, int autoCloseDelay = 0)
+        public static IDisposable PopupScope(PopupViewModelBase viewModel, int autoCloseDelay = 1000)
         {
             return _viewService.PopupScope(viewModel, autoCloseDelay);
         }
@@ -117,8 +117,8 @@ namespace BPFTP.Services
 
         public IDisposable PopupScope(PopupViewModelBase viewModel, int autoCloseDelay = 0)
         {
-            ShowPopup(viewModel, autoCloseDelay);
-            return Disposable.Create(() => HidePopup(viewModel));
+            ShowPopup(viewModel, 0);
+            return Disposable.Create(() =>Task.Delay(autoCloseDelay).ContinueWith(_ => HidePopup(viewModel)));
         }
     }
 

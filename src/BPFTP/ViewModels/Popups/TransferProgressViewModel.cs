@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using BPFTP.Services;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using R3;
 using System;
@@ -33,6 +34,7 @@ namespace BPFTP.ViewModels
         private double _speed = 0;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsError))]
         private string _errorMessage = string.Empty;
 
 
@@ -44,6 +46,8 @@ namespace BPFTP.ViewModels
         public void Cancel()
         {
             CancellationTokenSource.Cancel();
+            ErrorMessage = "已取消";
+            Task.Delay(5000).ContinueWith(_ => ViewOperation.HidePopup(this));
         }
     }
 }
