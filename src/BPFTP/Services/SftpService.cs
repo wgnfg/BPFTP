@@ -163,7 +163,7 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
 
             if (item.IsDirectory)
             {
-                await DownloadDirectoryRecursiveAsync(remoteItemPath, localItemPath, observer, sftpClient);
+                await DownloadDirectoryRecursiveAsync(remoteItemPath, localItemPath, observer, sftpClient, token);
             }
             else
             {

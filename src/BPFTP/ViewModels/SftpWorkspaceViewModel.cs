@@ -25,6 +25,8 @@ namespace BPFTP.ViewModels
             LocalDropHandler = new LocalDropHandler(this);
             _ = InitConnectionItemsAsync();
             InitExplorer();
+            InitStateSaving();
+            _ = InitStateAsync();
         }
         private readonly DatabaseService _databaseService;
         private readonly SftpService _sftpService;
@@ -44,7 +46,15 @@ namespace BPFTP.ViewModels
             try
             {
                 await _sftpService.Connect2Async(SelectedConnection);
-                RemoteExplorer.CurPath = "/";
+                if(string.IsNullOrEmpty(RemoteExplorer.CurPath))
+                {
+                    RemoteExplorer.CurPath = "/";
+                }
+                else
+                {
+                    await RemoteExplorer.Refresh();
+                }
+
                 _logger.LogInformation("Successfully connected to {Host}", SelectedConnection.Host);
                 ViewOperation.ShowPopupShort(new NormalPopupViewModel() { Message = $"连接成功" });
             }

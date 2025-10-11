@@ -35,6 +35,7 @@ namespace BPFTP.Services
 
             _db.DbMaintenance.CreateDatabase();
             _db.CodeFirst.InitTables<ConnectionProfile>();
+            _db.CodeFirst.InitTables<ApplicationSetting>();
         }
 
         public Task<List<ConnectionProfile>> GetConnectionsAsync() => _db.Queryable<ConnectionProfile>().ToListAsync();
@@ -42,6 +43,19 @@ namespace BPFTP.Services
         public Task<int> SaveConnectionAsync(ConnectionProfile profile) => _db.Storageable(profile).ExecuteCommandAsync();
 
         public Task<int> DeleteConnectionAsync(int id) => _db.Deleteable<ConnectionProfile>().In(id).ExecuteCommandAsync();
+
+        public async Task<string?> GetSettingAsync(SettingKey key)
+        {
+            return (await _db.Queryable<ApplicationSetting>().FirstAsync(it => it.Key == key))?.Value;
+        }
+
+        public async Task<int> SaveSettingAsync(SettingKey key, string value)
+        {
+            var setting = (await _db.Queryable<ApplicationSetting>().Where(X => X.Key == key).FirstAsync()) ?? new();
+            setting.Value = value;
+            return await _db.Storageable(setting).WhereColumns(it => it.Key).ExecuteCommandAsync();
+        }
+
     }
 
 }

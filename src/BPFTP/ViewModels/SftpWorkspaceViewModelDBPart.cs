@@ -25,7 +25,6 @@ namespace BPFTP.ViewModels
         [NotifyCanExecuteChangedFor(nameof(SshCommand))]
         private ConnectionProfile? _selectedConnection;
 
-
         [RelayCommand]
         private async Task AddConnection()
         {
