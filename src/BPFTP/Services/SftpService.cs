@@ -121,9 +121,9 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
             {
                 var (Timestamp, Value) = buf[0];
                 var curr = buf[^1];
-                var bytesDiff = (curr.Value - Value) / (1024 * 1024d);
-                var secondsDiff = (curr.Timestamp - Timestamp) / (double)Stopwatch.Frequency;
-                var speedBps = secondsDiff > 0 ? bytesDiff / secondsDiff : 0;
+                var MBDiff = (curr.Value - Value).ToMB();
+                var secondsDiff = (curr.Timestamp - Timestamp).ToSecond();
+                var speedBps = secondsDiff > 0 ? MBDiff / secondsDiff : 0;
                 return new TransferProgress()
                 {
                     Percentage = curr.Value * percentMultiply,
@@ -241,9 +241,9 @@ public class SftpService(ISecureCredentialService secureCredentialService) : IDi
             {
                 var (Timestamp, Value) = buf[0];
                 var curr = buf[^1];
-                var bytesDiff = (curr.Value - Value) / (1024 * 1024d);
-                var secondsDiff = (curr.Timestamp - Timestamp) / (double)Stopwatch.Frequency;
-                var speedBps = secondsDiff > 0 ? bytesDiff / secondsDiff : 0;
+                var MBDiff = (curr.Value - Value).ToMB();
+                var secondsDiff = (curr.Timestamp - Timestamp).ToSecond();
+                var speedBps = secondsDiff > 0 ? MBDiff / secondsDiff : 0;
                 return new TransferProgress()
                 {
                     Percentage = curr.Value * percentMultiply,

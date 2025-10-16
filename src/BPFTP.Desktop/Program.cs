@@ -8,7 +8,6 @@ using System;
 using System.Runtime.Versioning;
 namespace BPFTP.Desktop;
 
-[SupportedOSPlatform("windows")]
 class Program
 {
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -31,11 +30,22 @@ class Program
             .LogToTrace()
             .AfterPlatformServicesSetup(b => App.ServicesCollection.AddLogging())
             .UseR3();
-        public static void ConfigureServices(IServiceCollection services)
+    public static void ConfigureServices(IServiceCollection services)
+    {
+        services.AddSingleton<SftpWorkspaceViewModel, SftpWorkspaceViewModel>();
+        services.AddSingleton<IPermissionService, DesktopPermissionService>();
+        if (OperatingSystem.IsWindows())
         {
-            services.AddSingleton<SftpWorkspaceViewModel, SftpWorkspaceViewModel>();
-            services.AddSingleton<IPermissionService, DesktopPermissionService>();
             services.AddSingleton<ISecureCredentialService, DesktopSecureCredentialService>();
         }
+        if (OperatingSystem.IsLinux())
+        {
+            services.AddSingleton<ISecureCredentialService, DummySecureCredentialService>();
+        }
+        if (OperatingSystem.IsMacOS())
+        {
+            services.AddSingleton<ISecureCredentialService, DummySecureCredentialService>();
+        }
+    }
 
 }

@@ -61,8 +61,12 @@ namespace BPFTP.ViewModels
             var password = profile.Password;
             var privateKeyPassword = profile.PrivateKeyPassword;
 
-            profile.Password = string.Empty;
-            profile.PrivateKeyPassword = string.Empty;
+            if(_secureCredentialService is not DummySecureCredentialService)
+            {
+                // todo:部分平台未实现安全密码存储时先直接存
+                profile.Password = string.Empty;
+                profile.PrivateKeyPassword = string.Empty;
+            }
 
             await _databaseService.SaveConnectionAsync(profile);
 
