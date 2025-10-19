@@ -1,0 +1,1 @@
+dotnet publish ..\src\BPFTP.Desktop -c Release -r win-x64 --self-contained true /p:PublishAot=true /p:PublishSingleFile=true  /p:IncludeNativeLibrariesForSelfExtract=true /p:IncludeAllContentForSelfExtract=true  -o desktop

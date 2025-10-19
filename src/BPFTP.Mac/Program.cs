@@ -1,12 +1,12 @@
 ﻿using Avalonia;
-using BPFTP.Desktop.Services;
 using BPFTP.Services;
 using BPFTP.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using SqlSugar;
 using System;
+using System.Reflection.PortableExecutable;
 using System.Runtime.Versioning;
-namespace BPFTP.Desktop;
+namespace BPFTP.Mac;
 
 class Program
 {
@@ -33,7 +33,7 @@ class Program
     public static void ConfigureServices(IServiceCollection services)
     {
         services.AddSingleton<SftpWorkspaceViewModel, SftpWorkspaceViewModel>();
-        services.AddSingleton<IPermissionService, DesktopPermissionService>();
+        services.AddSingleton<IPermissionService, DummyPermissionService>();
         services.AddSingleton<ISecureCredentialService, DummySecureCredentialService>();
     }
 

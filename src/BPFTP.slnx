@@ -1,9 +1,19 @@
 <Solution>
-  <Folder Name="/Solution Items/" />
+  <Folder Name="/Solution Items/">
+    <File Path="../scripts/publish_android.bat" />
+    <File Path="../scripts/publish_desktop_aot.bat" />
+    <File Path="../scripts/publish_linux.bat" />
+    <File Path="../scripts/publish_mac.bat" />
+    <File Path="Directory.Packages.props" />
+    <File Path="Directory.Build.props" />
+    
+  </Folder>
   <Project Path="BPFTP.Android/BPFTP.Android.csproj">
-    <Deploy Solution="Debug|*" />
+    <Deploy />
   </Project>
   <Project Path="BPFTP.Desktop/BPFTP.Desktop.csproj" />
   <Project Path="BPFTP.iOS/BPFTP.iOS.csproj" />
+  <Project Path="BPFTP.Linux/BPFTP.Linux.csproj" />
+  <Project Path="BPFTP.Mac/BPFTP.Mac.csproj" />
   <Project Path="BPFTP/BPFTP.csproj" />
 </Solution>

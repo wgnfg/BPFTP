@@ -1,0 +1,1 @@
+dotnet publish ..\src\BPFTP.Linux -c Release -r linux-x64 --self-contained true /p:PublishAot=false -o Linux

@@ -1,0 +1,11 @@
+
+<Directives>
+    <Application>
+        <Assembly Name="SqlSugar"  Dynamic="Required All">
+         </Assembly>  
+         <Assembly Name="BPFTP"  Dynamic="Required All">
+         </Assembly>  
+        <Assembly Name="BPFTP.Mac"  Dynamic="Required All">
+         </Assembly>  
+    </Application>
+</Directives>

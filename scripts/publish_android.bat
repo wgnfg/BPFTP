@@ -1,0 +1,1 @@
+dotnet publish ..\src\BPFTP.Android -c Release -f net9.0-android -o Android

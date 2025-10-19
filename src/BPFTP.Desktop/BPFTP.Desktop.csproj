@@ -6,11 +6,13 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+	 <DisableUnsupportedError>true</DisableUnsupportedError>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-	  <PublishAot>true</PublishAot>
-	  <TrimMode>full</TrimMode>
-	  <InvariantGlobalization>false</InvariantGlobalization>
-	  <IlcOptimizationPreference>Space</IlcOptimizationPreference>
+	<PublishAot>true</PublishAot>
+	<TrimMode>full</TrimMode>
+	<InvariantGlobalization>false</InvariantGlobalization>
+	<IlcOptimizationPreference>Space</IlcOptimizationPreference>
+	<BuiltInComInteropSupport>false</BuiltInComInteropSupport>
   </PropertyGroup>
 
   <ItemGroup>
